@@ -27,8 +27,7 @@ export default function App() {
     event.preventDefault()
 
     const file = event.dataTransfer?.files[0]
-    if (!file) return
-    if (!file.type.startsWith("image/")) return
+    if (!file?.type.startsWith("image/")) return
 
     const image = await loadImage(URL.createObjectURL(file))
     const frame = frameRef.current!
