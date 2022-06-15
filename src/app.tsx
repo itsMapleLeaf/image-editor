@@ -9,7 +9,7 @@ type ImageSprite = {
 
 export default function App() {
   const [images, setImages] = useState<ImageSprite[]>([])
-  const canvasRef = useRef<HTMLCanvasElement>(null)
+  const frameRef = useRef<HTMLDivElement>(null)
 
   useWindowEvent("dragenter", (event) => event.preventDefault())
   useWindowEvent("dragleave", (event) => event.preventDefault())
@@ -31,10 +31,9 @@ export default function App() {
     if (!file.type.startsWith("image/")) return
 
     const image = await loadImage(URL.createObjectURL(file))
-
-    const canvas = canvasRef.current!
-    const left = event.clientX - canvas.offsetLeft - image.width / 2
-    const top = event.clientY - canvas.offsetTop - image.height / 2
+    const frame = frameRef.current!
+    const left = event.clientX - frame.offsetLeft - image.width / 2
+    const top = event.clientY - frame.offsetTop - image.height / 2
 
     setImages((images) => [
       ...images,
@@ -42,25 +41,22 @@ export default function App() {
     ])
   })
 
-  useEffect(() => {
-    const canvas = canvasRef.current!
-    const context = canvas.getContext("2d")!
-
-    context.clearRect(0, 0, canvas.width, canvas.height)
-
-    for (const image of images) {
-      context.drawImage(image.image, image.left, image.top)
-    }
-  })
-
   return (
     <main className="p-8">
-      <canvas
-        className="mx-auto block bg-white"
-        width={1280}
-        height={720}
-        ref={canvasRef}
-      />
+      <div
+        className="mx-auto block bg-white w-[1280px] max-w-full aspect-video relative overflow-clip"
+        ref={frameRef}
+      >
+        {images.map((sprite) => (
+          <img
+            key={sprite.id}
+            alt=""
+            src={sprite.image.src}
+            className="absolute"
+            style={{ left: sprite.left, top: sprite.top }}
+          />
+        ))}
+      </div>
     </main>
   )
 }
