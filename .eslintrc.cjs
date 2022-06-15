@@ -15,7 +15,4 @@ module.exports = {
   parserOptions: {
     project: require.resolve("./tsconfig.json"),
   },
-  rules: {
-    "unicorn/prefer-module": "off",
-  },
 }
