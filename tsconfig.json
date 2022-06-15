@@ -10,5 +10,6 @@
     "**/dist/**",
     "**/.cache/**",
     "**/coverage/**"
-  ]
+  ],
+  "references": [{ "path": "./tsconfig.node.json" }]
 }
