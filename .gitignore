@@ -4,8 +4,12 @@ node_modules
 .env
 .vercel
 .output
-
 /build/
 /public/build
 /api/index.js
 /api/index.js.map
+build
+dist
+coverage
+.vscode
+app/tailwind.css
