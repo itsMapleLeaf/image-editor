@@ -1,33 +1,13 @@
-import { mdiCircleOutline, mdiSquareOutline, mdiVectorRectangle } from "@mdi/js"
-import { Icon } from "@mdi/react"
-import clsx from "clsx"
-import { useEffect, useRef, useState } from "react"
-import { Button } from "./button"
-import { Popover } from "./popover"
+import { observer } from "mobx-react-lite"
+import { useRef } from "react"
+import { EditorSprites } from "./editor-sprites"
+import type { EditorStore } from "./editor-store"
+import { FrameOptionsButton } from "./frame-options-button"
+import { FrameView } from "./frame-view"
+import { loadImage } from "./load-image"
+import { useWindowEvent } from "./use-window-event"
 
-type ImageSprite = {
-  id: string
-  image: HTMLImageElement
-  left: number
-  top: number
-}
-
-const frameShapeOptions = [
-  {
-    name: "Rectangle",
-    icon: <Icon path={mdiSquareOutline} className="w-8" />,
-  },
-  {
-    name: "Circle",
-    icon: <Icon path={mdiCircleOutline} className="w-8" />,
-  },
-] as const
-
-type FrameShape = typeof frameShapeOptions[number]
-
-export default function App() {
-  const [sprites, setSprites] = useState<ImageSprite[]>([])
-  const [frameShape, setFrameShape] = useState<FrameShape>(frameShapeOptions[0])
+export const App = observer(function App({ store }: { store: EditorStore }) {
   const frameRef = useRef<HTMLDivElement>(null)
 
   useWindowEvent("dragenter", (event) => event.preventDefault())
@@ -54,119 +34,30 @@ export default function App() {
     const left = event.pageX - rect.left - image.width / 2
     const top = event.pageY - rect.top - image.height / 2
 
-    setSprites((images) => [
-      ...images,
-      { id: crypto.randomUUID(), image, left, top },
-    ])
+    store.addSprite({ id: crypto.randomUUID(), image, left, top })
   })
 
   return (
     <div className="fixed inset-0 flex flex-row">
-      <nav className="flex h-full flex-col overflow-y-auto bg-slate-800 p-2">
-        <div className="my-auto flex flex-col gap-2">
-          <Popover
-            button={
-              <Icon title="Frame" path={mdiVectorRectangle} className="w-8" />
-            }
-            panel={
-              <section className="p-2">
-                <h2 className="mb-1 select-none text-xs font-bold uppercase tracking-[0.1px] opacity-50">
-                  Frame Shape
-                </h2>
-                <div className="flex gap-2">
-                  {frameShapeOptions.map((option) => (
-                    <Button
-                      key={option.name}
-                      title={option.name}
-                      active={frameShape === option}
-                      onClick={() => setFrameShape(option)}
-                    >
-                      {option.icon}
-                    </Button>
-                  ))}
-                </div>
-              </section>
-            }
-          />
-        </div>
+      <nav>
+        <EditorToolsContainer>
+          <FrameOptionsButton store={store} />
+        </EditorToolsContainer>
       </nav>
-      <main className="relative flex min-w-0 flex-1 overflow-auto p-4">
-        <div className="absolute inset-0 flex">
-          <div className="m-auto">
-            <div
-              className={clsx(
-                "relative bg-black/25 brightness-50 filter",
-                frameShape.name === "Circle" && "rounded-full",
-              )}
-              style={{ width: 100, height: 100 }}
-            >
-              {sprites.map((sprite) => (
-                <img
-                  key={sprite.id}
-                  alt=""
-                  src={sprite.image.src}
-                  className="absolute"
-                  style={{
-                    left: sprite.left,
-                    top: sprite.top,
-                    minWidth: sprite.image.width,
-                    minHeight: sprite.image.height,
-                  }}
-                />
-              ))}
-            </div>
-          </div>
-        </div>
-        <div className="absolute inset-0 flex">
-          <div className="m-auto">
-            <div
-              className={clsx(
-                "relative overflow-clip",
-                frameShape.name === "Circle" && "rounded-full",
-              )}
-              style={{ width: 100, height: 100 }}
-              ref={frameRef}
-            >
-              {sprites.map((sprite) => (
-                <img
-                  key={sprite.id}
-                  alt=""
-                  src={sprite.image.src}
-                  className="absolute"
-                  style={{
-                    left: sprite.left,
-                    top: sprite.top,
-                    minWidth: sprite.image.width,
-                    minHeight: sprite.image.height,
-                  }}
-                />
-              ))}
-            </div>
-          </div>
-        </div>
+      <main className="min-w-0 flex-1">
+        <FrameView store={store} frameRef={frameRef}>
+          <EditorSprites store={store} />
+        </FrameView>
       </main>
     </div>
   )
-}
+})
 
-function useWindowEvent<Event extends keyof WindowEventMap>(
-  event: Event,
-  handler: (event: WindowEventMap[Event]) => void,
-  options?: boolean | AddEventListenerOptions,
-) {
-  useEffect(() => {
-    window.addEventListener(event, handler, options)
-    return () => {
-      window.removeEventListener(event, handler, options)
-    }
-  })
-}
-
-function loadImage(url: string): Promise<HTMLImageElement> {
-  return new Promise((resolve, reject) => {
-    const image = new Image()
-    image.src = url
-    image.addEventListener("load", () => resolve(image))
-    image.addEventListener("error", reject)
-  })
+// eslint-disable-next-line mobx/missing-observer
+function EditorToolsContainer({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="flex h-full flex-col overflow-y-auto bg-slate-800 p-2">
+      <div className="my-auto flex flex-col gap-2">{children}</div>
+    </div>
+  )
 }
