@@ -1,3 +1,5 @@
+import { ChartSquareBarIcon, CogIcon, EyeIcon } from "@heroicons/react/solid"
+import type { ComponentPropsWithoutRef } from "react"
 import { useEffect, useRef, useState } from "react"
 
 type ImageSprite = {
@@ -8,7 +10,7 @@ type ImageSprite = {
 }
 
 export default function App() {
-  const [images, setImages] = useState<ImageSprite[]>([])
+  const [sprites, setSprites] = useState<ImageSprite[]>([])
   const frameRef = useRef<HTMLDivElement>(null)
 
   useWindowEvent("dragenter", (event) => event.preventDefault())
@@ -31,32 +33,81 @@ export default function App() {
 
     const image = await loadImage(URL.createObjectURL(file))
     const frame = frameRef.current!
-    const left = event.clientX - frame.offsetLeft - image.width / 2
-    const top = event.clientY - frame.offsetTop - image.height / 2
+    const rect = frame.getBoundingClientRect()
+    const left = event.pageX - rect.left - image.width / 2
+    const top = event.pageY - rect.top - image.height / 2
 
-    setImages((images) => [
+    setSprites((images) => [
       ...images,
       { id: crypto.randomUUID(), image, left, top },
     ])
   })
 
   return (
-    <main className="p-8">
-      <div
-        className="relative mx-auto block aspect-video w-[1280px] max-w-full overflow-clip bg-white"
-        ref={frameRef}
-      >
-        {images.map((sprite) => (
-          <img
-            key={sprite.id}
-            alt=""
-            src={sprite.image.src}
-            className="absolute"
-            style={{ left: sprite.left, top: sprite.top }}
-          />
-        ))}
-      </div>
-    </main>
+    <div className="fixed inset-0 flex flex-row">
+      <nav className="flex h-full flex-col overflow-y-auto bg-slate-800 p-2">
+        <div className="my-auto flex flex-col gap-2">
+          <ToolButton>
+            <CogIcon className="w-8" />
+          </ToolButton>
+          <ToolButton>
+            <EyeIcon className="w-8" />
+          </ToolButton>
+          <ToolButton>
+            <ChartSquareBarIcon className="w-8" />
+          </ToolButton>
+        </div>
+      </nav>
+      <main className="relative flex min-w-0 flex-1 overflow-auto p-4">
+        <div className="absolute inset-0 flex">
+          <div className="m-auto">
+            <div
+              className="relative bg-black/25 brightness-50 filter"
+              style={{ width: 100, height: 100 }}
+            >
+              {sprites.map((sprite) => (
+                <img
+                  key={sprite.id}
+                  alt=""
+                  src={sprite.image.src}
+                  className="absolute"
+                  style={{
+                    left: sprite.left,
+                    top: sprite.top,
+                    minWidth: sprite.image.width,
+                    minHeight: sprite.image.height,
+                  }}
+                />
+              ))}
+            </div>
+          </div>
+        </div>
+        <div className="absolute inset-0 flex">
+          <div className="m-auto">
+            <div
+              className="relative overflow-clip"
+              style={{ width: 100, height: 100 }}
+              ref={frameRef}
+            >
+              {sprites.map((sprite) => (
+                <img
+                  key={sprite.id}
+                  alt=""
+                  src={sprite.image.src}
+                  className="absolute"
+                  style={{
+                    left: sprite.left,
+                    top: sprite.top,
+                    minWidth: sprite.image.width,
+                    minHeight: sprite.image.height,
+                  }}
+                />
+              ))}
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
   )
 }
 
@@ -80,4 +131,13 @@ function loadImage(url: string): Promise<HTMLImageElement> {
     image.addEventListener("load", () => resolve(image))
     image.addEventListener("error", reject)
   })
+}
+
+function ToolButton(props: ComponentPropsWithoutRef<"button">) {
+  return (
+    <button
+      {...props}
+      className="rounded-md bg-slate-600 p-1 opacity-50 transition-opacity hover:opacity-100"
+    />
+  )
 }
