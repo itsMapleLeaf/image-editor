@@ -1,6 +1,7 @@
-import { ChartSquareBarIcon, CogIcon, EyeIcon } from "@heroicons/react/solid"
-import type { ComponentPropsWithoutRef } from "react"
+import { mdiVectorRectangle } from "@mdi/js"
+import Icon from "@mdi/react"
 import { useEffect, useRef, useState } from "react"
+import { Popover } from "./popover"
 
 type ImageSprite = {
   id: string
@@ -47,15 +48,18 @@ export default function App() {
     <div className="fixed inset-0 flex flex-row">
       <nav className="flex h-full flex-col overflow-y-auto bg-slate-800 p-2">
         <div className="my-auto flex flex-col gap-2">
-          <ToolButton>
-            <CogIcon className="w-8" />
-          </ToolButton>
-          <ToolButton>
-            <EyeIcon className="w-8" />
-          </ToolButton>
-          <ToolButton>
-            <ChartSquareBarIcon className="w-8" />
-          </ToolButton>
+          <Popover
+            button={<Icon path={mdiVectorRectangle} className="w-8" />}
+            panel={<p>🍍</p>}
+          />
+          <Popover
+            button={<Icon path={mdiVectorRectangle} className="w-8" />}
+            panel={<p>🍍</p>}
+          />
+          <Popover
+            button={<Icon path={mdiVectorRectangle} className="w-8" />}
+            panel={<p>🍍</p>}
+          />
         </div>
       </nav>
       <main className="relative flex min-w-0 flex-1 overflow-auto p-4">
@@ -131,13 +135,4 @@ function loadImage(url: string): Promise<HTMLImageElement> {
     image.addEventListener("load", () => resolve(image))
     image.addEventListener("error", reject)
   })
-}
-
-function ToolButton(props: ComponentPropsWithoutRef<"button">) {
-  return (
-    <button
-      {...props}
-      className="rounded-md bg-slate-600 p-1 opacity-50 transition-opacity hover:opacity-100"
-    />
-  )
 }

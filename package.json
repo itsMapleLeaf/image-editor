@@ -15,12 +15,16 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@heroicons/react": "^1.0.6",
-    "@itsmapleleaf/configs": "^1.1.3",
+    "@headlessui/react": "^1.6.4",
+    "@mdi/js": "^6.7.96",
+    "@mdi/react": "^1.6.0",
+    "@popperjs/core": "^2.11.5",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "react-popper": "^2.3.0"
   },
   "devDependencies": {
+    "@itsmapleleaf/configs": "^1.1.3",
     "@rushstack/eslint-patch": "^1.1.3",
     "@types/eslint": "^8.4.3",
     "@types/prettier": "^2.6.3",
