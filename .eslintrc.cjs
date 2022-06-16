@@ -19,4 +19,12 @@ module.exports = {
   parserOptions: {
     project: require.resolve("./tsconfig.json"),
   },
+  overrides: [
+    {
+      files: ["src/ui/**/*"],
+      rules: {
+        "mobx/missing-observer": "off",
+      },
+    },
+  ],
 }
