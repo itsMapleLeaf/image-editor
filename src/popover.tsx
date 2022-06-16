@@ -2,8 +2,8 @@ import { Popover as HeadlessPopover, Transition } from "@headlessui/react"
 import type { ReactNode } from "react"
 import { useState } from "react"
 import { usePopper } from "react-popper"
+import { Button } from "./button"
 import { Portal } from "./portal"
-import { ToolButton } from "./tool-button"
 
 export function Popover(props: { button: ReactNode; panel: ReactNode }) {
   const [referenceElement, setReferenceElement] = useState<Element | null>()
@@ -15,7 +15,7 @@ export function Popover(props: { button: ReactNode; panel: ReactNode }) {
       {
         name: "offset",
         options: {
-          offset: [0, 10],
+          offset: [0, 16],
         },
       },
     ],
@@ -25,7 +25,7 @@ export function Popover(props: { button: ReactNode; panel: ReactNode }) {
     <HeadlessPopover>
       {({ open }) => (
         <>
-          <HeadlessPopover.Button as={ToolButton} ref={setReferenceElement}>
+          <HeadlessPopover.Button as={Button} ref={setReferenceElement}>
             {props.button}
           </HeadlessPopover.Button>
           <Transition.Root show={open}>
@@ -45,7 +45,7 @@ export function Popover(props: { button: ReactNode; panel: ReactNode }) {
                 >
                   <HeadlessPopover.Panel
                     static
-                    className="relative rounded-md bg-slate-800 p-2 shadow"
+                    className="relative rounded-md bg-slate-800 shadow"
                   >
                     {props.panel}
                   </HeadlessPopover.Panel>

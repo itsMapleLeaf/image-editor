@@ -1,6 +1,8 @@
-import { mdiVectorRectangle } from "@mdi/js"
+import { mdiCircleOutline, mdiSquareOutline, mdiVectorRectangle } from "@mdi/js"
 import Icon from "@mdi/react"
+import clsx from "clsx"
 import { useEffect, useRef, useState } from "react"
+import { Button } from "./button"
 import { Popover } from "./popover"
 
 type ImageSprite = {
@@ -10,8 +12,22 @@ type ImageSprite = {
   top: number
 }
 
+const frameShapeOptions = [
+  {
+    name: "Rectangle",
+    icon: <Icon path={mdiSquareOutline} className="w-8" />,
+  },
+  {
+    name: "Circle",
+    icon: <Icon path={mdiCircleOutline} className="w-8" />,
+  },
+] as const
+
+type FrameShape = typeof frameShapeOptions[number]
+
 export default function App() {
   const [sprites, setSprites] = useState<ImageSprite[]>([])
+  const [frameShape, setFrameShape] = useState<FrameShape>(frameShapeOptions[0])
   const frameRef = useRef<HTMLDivElement>(null)
 
   useWindowEvent("dragenter", (event) => event.preventDefault())
@@ -49,16 +65,28 @@ export default function App() {
       <nav className="flex h-full flex-col overflow-y-auto bg-slate-800 p-2">
         <div className="my-auto flex flex-col gap-2">
           <Popover
-            button={<Icon path={mdiVectorRectangle} className="w-8" />}
-            panel={<p>🍍</p>}
-          />
-          <Popover
-            button={<Icon path={mdiVectorRectangle} className="w-8" />}
-            panel={<p>🍍</p>}
-          />
-          <Popover
-            button={<Icon path={mdiVectorRectangle} className="w-8" />}
-            panel={<p>🍍</p>}
+            button={
+              <Icon title="Frame" path={mdiVectorRectangle} className="w-8" />
+            }
+            panel={
+              <section className="p-2">
+                <h2 className="mb-1 select-none text-xs font-bold uppercase tracking-[0.1px] opacity-50">
+                  Frame Shape
+                </h2>
+                <div className="flex gap-2">
+                  {frameShapeOptions.map((option) => (
+                    <Button
+                      key={option.name}
+                      title={option.name}
+                      active={frameShape === option}
+                      onClick={() => setFrameShape(option)}
+                    >
+                      {option.icon}
+                    </Button>
+                  ))}
+                </div>
+              </section>
+            }
           />
         </div>
       </nav>
@@ -66,7 +94,10 @@ export default function App() {
         <div className="absolute inset-0 flex">
           <div className="m-auto">
             <div
-              className="relative bg-black/25 brightness-50 filter"
+              className={clsx(
+                "relative bg-black/25 brightness-50 filter",
+                frameShape.name === "Circle" && "rounded-full",
+              )}
               style={{ width: 100, height: 100 }}
             >
               {sprites.map((sprite) => (
@@ -89,7 +120,10 @@ export default function App() {
         <div className="absolute inset-0 flex">
           <div className="m-auto">
             <div
-              className="relative overflow-clip"
+              className={clsx(
+                "relative overflow-clip",
+                frameShape.name === "Circle" && "rounded-full",
+              )}
               style={{ width: 100, height: 100 }}
               ref={frameRef}
             >
