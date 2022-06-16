@@ -5,7 +5,6 @@ import { usePopper } from "react-popper"
 import { Button } from "./button"
 import { Portal } from "./portal"
 
-// eslint-disable-next-line mobx/missing-observer
 export function Popover(props: { button: ReactNode; panel: ReactNode }) {
   const [referenceElement, setReferenceElement] = useState<Element | null>()
   const [popperElement, setPopperElement] = useState<HTMLElement | null>()
