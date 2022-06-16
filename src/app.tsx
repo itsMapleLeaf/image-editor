@@ -1,4 +1,6 @@
 import { useRef, useState } from "react"
+import { loadImage } from "./dom/load-image"
+import { useWindowEvent } from "./dom/use-window-event"
 import { EditorSprite } from "./editor/editor-sprite"
 import { FrameOptionsButton } from "./editor/frame-options-button"
 import type { FrameShape } from "./editor/frame-shape"
@@ -6,8 +8,6 @@ import { frameShapeOptions } from "./editor/frame-shape"
 import { FrameView } from "./editor/frame-view"
 import type { ImageSprite } from "./editor/image-sprite"
 import { Button } from "./ui/button"
-import { loadImage } from "./ui/load-image"
-import { useWindowEvent } from "./ui/use-window-event"
 
 export function App() {
   const [sprites, setSprites] = useState<ImageSprite[]>([])
