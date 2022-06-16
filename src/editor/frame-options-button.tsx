@@ -1,7 +1,9 @@
 import { mdiVectorRectangle } from "@mdi/js"
 import { Icon } from "@mdi/react"
 import type { ReactNode } from "react"
+import { Button } from "../ui/button"
 import { Popover } from "../ui/popover"
+import { EditorToolPanel, EditorToolPanelSection } from "./editor-tool-panel"
 
 export function FrameOptionsButton({
   shapeOptions,
@@ -10,14 +12,21 @@ export function FrameOptionsButton({
 }) {
   return (
     <Popover
-      button={<Icon title="Frame" path={mdiVectorRectangle} className="w-8" />}
+      button={
+        <Button>
+          <Icon title="Frame" path={mdiVectorRectangle} className="w-8" />
+        </Button>
+      }
       panel={
-        <section className="p-2">
-          <h2 className="mb-1 select-none text-xs font-bold uppercase tracking-[0.1px] opacity-50">
-            Frame Shape
-          </h2>
-          <div className="flex gap-2">{shapeOptions}</div>
-        </section>
+        <EditorToolPanel>
+          <EditorToolPanelSection title="Shape">
+            {shapeOptions}
+          </EditorToolPanelSection>
+          <EditorToolPanelSection title="Size">TODO</EditorToolPanelSection>
+          <EditorToolPanelSection title="Aspect ratio">
+            TODO
+          </EditorToolPanelSection>
+        </EditorToolPanel>
       }
     />
   )
