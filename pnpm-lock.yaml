@@ -16,9 +16,6 @@ specifiers:
   c8: ^7.11.3
   clsx: ^1.1.1
   eslint: ^8.17.0
-  eslint-plugin-mobx: ^0.0.8
-  mobx: ^6.6.0
-  mobx-react-lite: ^3.4.0
   postcss: ^8.4.14
   prettier: ^2.7.0
   prettier-plugin-tailwindcss: ^0.1.11
@@ -36,8 +33,6 @@ dependencies:
   '@mdi/react': 1.6.0
   '@popperjs/core': 2.11.5
   clsx: 1.1.1
-  mobx: 6.6.0
-  mobx-react-lite: 3.4.0_5bx6dzokqdjvseagkoblw2h36i
   react: 18.2.0
   react-dom: 18.2.0_react@18.2.0
   react-popper: 2.3.0_ili5ylfne7i3hkfpsanzgkfu6m
@@ -53,7 +48,6 @@ devDependencies:
   autoprefixer: 10.4.7_postcss@8.4.14
   c8: 7.11.3
   eslint: 8.17.0
-  eslint-plugin-mobx: 0.0.8_eslint@8.17.0
   postcss: 8.4.14
   prettier: 2.7.0
   prettier-plugin-tailwindcss: 0.1.11_prettier@2.7.0
@@ -1619,14 +1613,6 @@ packages:
       minimatch: 3.1.2
     dev: true
 
-  /eslint-plugin-mobx/0.0.8_eslint@8.17.0:
-    resolution: {integrity: sha512-cOy9lo4E2uiQ3GmHOELJLCV0VYxO9WGIiGep1tyXQ6jSf5iIWjNTdO6qQgPvXrKbUCGOW/zeAOeh3Xa/nQB0LA==}
-    peerDependencies:
-      eslint: ^3.0.0 || ^4.0.0 || ^5.0.0 || ^6.0.0 || ^7.0.0 || ^8.0.0
-    dependencies:
-      eslint: 8.17.0
-    dev: true
-
   /eslint-plugin-react-hooks/4.6.0_eslint@8.17.0:
     resolution: {integrity: sha512-oFc7Itz9Qxh2x4gNHStv3BqJq54ExXmfC+a1NjAta66IAN87Wu0R/QArgIS9qKzX3dXKPI9H5crl9QchNMY9+g==}
     engines: {node: '>=10'}
@@ -2582,28 +2568,6 @@ packages:
   /minimist/1.2.6:
     resolution: {integrity: sha512-Jsjnk4bw3YJqYzbdyBiNsPWHPfO++UGG749Cxs6peCu5Xg4nrena6OVxOYxrQTqww0Jmwt+Ref8rggumkTLz9Q==}
     dev: true
-
-  /mobx-react-lite/3.4.0_5bx6dzokqdjvseagkoblw2h36i:
-    resolution: {integrity: sha512-bRuZp3C0itgLKHu/VNxi66DN/XVkQG7xtoBVWxpvC5FhAqbOCP21+nPhULjnzEqd7xBMybp6KwytdUpZKEgpIQ==}
-    peerDependencies:
-      mobx: ^6.1.0
-      react: ^16.8.0 || ^17 || ^18
-      react-dom: '*'
-      react-native: '*'
-    peerDependenciesMeta:
-      react-dom:
-        optional: true
-      react-native:
-        optional: true
-    dependencies:
-      mobx: 6.6.0
-      react: 18.2.0
-      react-dom: 18.2.0_react@18.2.0
-    dev: false
-
-  /mobx/6.6.0:
-    resolution: {integrity: sha512-MNTKevLH/6DShLZcmSL351+JgiJPO56A4GUpoiDQ3/yZ0mAtclNLdHK9q4BcQhibx8/JSDupfTpbX2NZPemlRg==}
-    dev: false
 
   /ms/2.1.2:
     resolution: {integrity: sha512-sGkPx+VjMtmA6MX27oA4FBFELFCZZ4S4XqeGOXCv68tT+jb3vk/RyaKWP0PTKyWtmLSM0b+adUTEvbs1PEaH2w==}

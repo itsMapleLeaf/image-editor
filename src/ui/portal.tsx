@@ -2,7 +2,6 @@ import type { ReactNode } from "react"
 import { useEffect, useState } from "react"
 import { createPortal } from "react-dom"
 
-// eslint-disable-next-line mobx/missing-observer
 export function Portal({ children }: { children: ReactNode }) {
   const [container, setContainer] = useState<HTMLElement>()
 

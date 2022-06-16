@@ -1,15 +1,12 @@
 import { mdiVectorRectangle } from "@mdi/js"
 import { Icon } from "@mdi/react"
-import { observer } from "mobx-react-lite"
-import { Button } from "../ui/button"
+import type { ReactNode } from "react"
 import { Popover } from "../ui/popover"
-import type { EditorStore } from "./editor-store"
-import { frameShapeOptions } from "./editor-store"
 
-export const FrameOptionsButton = observer(function FrameOptionsButton({
-  store,
+export function FrameOptionsButton({
+  shapeOptions,
 }: {
-  store: EditorStore
+  shapeOptions: ReactNode
 }) {
   return (
     <Popover
@@ -19,20 +16,9 @@ export const FrameOptionsButton = observer(function FrameOptionsButton({
           <h2 className="mb-1 select-none text-xs font-bold uppercase tracking-[0.1px] opacity-50">
             Frame Shape
           </h2>
-          <div className="flex gap-2">
-            {frameShapeOptions.map((option) => (
-              <Button
-                key={option.name}
-                title={option.name}
-                active={store.frameShapeName === option.name}
-                onClick={() => store.setFrameShape(option.name)}
-              >
-                {option.icon}
-              </Button>
-            ))}
-          </div>
+          <div className="flex gap-2">{shapeOptions}</div>
         </section>
       }
     />
   )
-})
+}
