@@ -1,11 +1,11 @@
 import { observer } from "mobx-react-lite"
 import { useRef } from "react"
-import { EditorSprites } from "./editor-sprites"
-import type { EditorStore } from "./editor-store"
-import { FrameOptionsButton } from "./frame-options-button"
-import { FrameView } from "./frame-view"
-import { loadImage } from "./load-image"
-import { useWindowEvent } from "./use-window-event"
+import { EditorSprites } from "./editor/editor-sprites"
+import type { EditorStore } from "./editor/editor-store"
+import { FrameOptionsButton } from "./editor/frame-options-button"
+import { FrameView } from "./editor/frame-view"
+import { loadImage } from "./ui/load-image"
+import { useWindowEvent } from "./ui/use-window-event"
 
 export const App = observer(function App({ store }: { store: EditorStore }) {
   const frameRef = useRef<HTMLDivElement>(null)
