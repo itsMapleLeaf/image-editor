@@ -1,10 +1,10 @@
 import { mdiVectorRectangle } from "@mdi/js"
 import { Icon } from "@mdi/react"
 import { observer } from "mobx-react-lite"
-import { Button } from "./button"
+import { Button } from "../ui/button"
+import { Popover } from "../ui/popover"
 import type { EditorStore } from "./editor-store"
 import { frameShapeOptions } from "./editor-store"
-import { Popover } from "./popover"
 
 export const FrameOptionsButton = observer(function FrameOptionsButton({
   store,
