@@ -2,7 +2,7 @@ import { Popover as HeadlessPopover, Transition } from "@headlessui/react"
 import type { ReactNode } from "react"
 import { useState } from "react"
 import { usePopper } from "react-popper"
-import { Button } from "./button"
+import { Slot } from "../react/slot"
 import { Portal } from "./portal"
 
 export function Popover(props: { button: ReactNode; panel: ReactNode }) {
@@ -25,7 +25,7 @@ export function Popover(props: { button: ReactNode; panel: ReactNode }) {
     <HeadlessPopover>
       {({ open }) => (
         <>
-          <HeadlessPopover.Button as={Button} ref={setReferenceElement}>
+          <HeadlessPopover.Button as={Slot} ref={setReferenceElement}>
             {props.button}
           </HeadlessPopover.Button>
           <Transition.Root show={open}>
@@ -43,10 +43,7 @@ export function Popover(props: { button: ReactNode; panel: ReactNode }) {
                   leaveFrom="transform scale-100 opacity-100"
                   leaveTo="transform scale-95 opacity-0"
                 >
-                  <HeadlessPopover.Panel
-                    static
-                    className="relative rounded-md bg-slate-800 shadow"
-                  >
+                  <HeadlessPopover.Panel static>
                     {props.panel}
                   </HeadlessPopover.Panel>
                 </Transition.Child>

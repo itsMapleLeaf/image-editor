@@ -46,16 +46,20 @@ export function App() {
       <nav>
         <EditorToolsContainer>
           <FrameOptionsButton
-            shapeOptions={frameShapeOptions.map((option) => (
-              <Button
-                key={option.name}
-                title={option.name}
-                active={frameShape.name === option.name}
-                onClick={() => setFrameShape(option)}
-              >
-                {option.icon}
-              </Button>
-            ))}
+            shapeOptions={
+              <div className="flex gap-2">
+                {frameShapeOptions.map((option) => (
+                  <Button
+                    key={option.name}
+                    title={option.name}
+                    active={frameShape.name === option.name}
+                    onClick={() => setFrameShape(option)}
+                  >
+                    {option.icon}
+                  </Button>
+                ))}
+              </div>
+            }
           />
         </EditorToolsContainer>
       </nav>
