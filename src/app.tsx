@@ -43,7 +43,7 @@ export default function App() {
   return (
     <main className="p-8">
       <div
-        className="mx-auto block bg-white w-[1280px] max-w-full aspect-video relative overflow-clip"
+        className="relative mx-auto block aspect-video w-[1280px] max-w-full overflow-clip bg-white"
         ref={frameRef}
       >
         {images.map((sprite) => (
