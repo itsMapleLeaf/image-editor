@@ -2,6 +2,7 @@ import clsx from "clsx"
 import type { ComponentPropsWithoutRef } from "react"
 import { forwardRef } from "react"
 
+// eslint-disable-next-line mobx/missing-observer
 export const Button = forwardRef(function Button(
   {
     active,
