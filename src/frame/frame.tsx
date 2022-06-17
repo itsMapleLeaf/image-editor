@@ -1,7 +1,7 @@
 import clsx from "clsx"
 import type { ForwardedRef, ReactNode, Ref } from "react"
 import { forwardRef } from "react"
-import type { FrameShape, FrameState } from "./frame-state"
+import type { FrameState } from "./frame-state"
 
 export function Frame({
   state,
@@ -16,12 +16,12 @@ export function Frame({
     <div className="relative flex h-full overflow-auto p-4">
       <div className="absolute inset-0 flex">
         <div className="m-auto">
-          <FrameShade shape={state.shape}>{children}</FrameShade>
+          <FrameShade state={state}>{children}</FrameShade>
         </div>
       </div>
       <div className="absolute inset-0 flex">
         <div className="m-auto">
-          <FrameHighlight shape={state.shape} ref={frameRef}>
+          <FrameHighlight state={state} ref={frameRef}>
             {children}
           </FrameHighlight>
         </div>
@@ -31,19 +31,19 @@ export function Frame({
 }
 
 function FrameShade({
-  shape,
+  state,
   children,
 }: {
-  shape: FrameShape
+  state: FrameState
   children: ReactNode
 }) {
   return (
     <div
       className={clsx(
         "relative bg-black/25 brightness-50 filter",
-        shape.name === "Circle" && "rounded-full",
+        state.shape.name === "Circle" && "rounded-full",
       )}
-      style={{ width: 100, height: 100 }}
+      style={{ width: state.width, height: state.height }}
     >
       {children}
     </div>
@@ -51,16 +51,16 @@ function FrameShade({
 }
 
 const FrameHighlight = forwardRef(function FrameHighlight(
-  { shape, children }: { shape: FrameShape; children: ReactNode },
+  { state, children }: { state: FrameState; children: ReactNode },
   ref: ForwardedRef<HTMLDivElement>,
 ) {
   return (
     <div
       className={clsx(
         "relative overflow-clip",
-        shape.name === "Circle" && "rounded-full",
+        state.shape.name === "Circle" && "rounded-full",
       )}
-      style={{ width: 100, height: 100 }}
+      style={{ width: state.width, height: state.height }}
       ref={ref}
     >
       {children}
