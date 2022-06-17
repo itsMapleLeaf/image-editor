@@ -10,8 +10,8 @@ export function Editor() {
   const [state, setState] = useState<EditorState>({
     sprites: [],
     frame: {
-      width: 100,
-      height: 100,
+      width: 640,
+      height: 360,
     },
   })
 
