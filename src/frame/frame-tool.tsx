@@ -15,6 +15,7 @@ export function FrameTool({
 }) {
   return (
     <Popover
+      placement="right"
       button={(props) => (
         <Button {...props}>
           <Icon title="Frame" path={mdiVectorRectangle} className="w-8" />
