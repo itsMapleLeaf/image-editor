@@ -1,7 +1,7 @@
 import type { ReactNode } from "react"
 import { RaisedPanel } from "../ui/raised-panel"
 
-export function EditorToolPanel({
+export function ToolPanel({
   title,
   children,
 }: {
@@ -20,7 +20,7 @@ export function EditorToolPanel({
   )
 }
 
-export function EditorToolPanelSection({
+export function ToolPanelSection({
   title,
   children,
 }: {

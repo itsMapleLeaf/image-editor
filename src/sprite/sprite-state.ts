@@ -1,4 +1,5 @@
-export type ImageSprite = {
+export type SpriteState = {
+  type: "image"
   id: string
   image: HTMLImageElement
   left: number

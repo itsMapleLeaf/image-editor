@@ -1,6 +1,6 @@
-import type { ImageSprite } from "./image-sprite"
+import type { SpriteState } from "./sprite-state"
 
-export function EditorSprite({ sprite }: { sprite: ImageSprite }) {
+export function Sprite({ sprite }: { sprite: SpriteState }) {
   return (
     <img
       alt=""

@@ -13,4 +13,9 @@ export const frameShapeOptions = [
 ] as const
 
 export type FrameShape = typeof frameShapeOptions[number]
-export type FrameShapeName = FrameShape["name"]
+
+export type FrameState = {
+  shape: FrameShape
+  width: number
+  height: number
+}
