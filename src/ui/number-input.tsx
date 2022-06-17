@@ -1,4 +1,5 @@
 import { ComponentPropsWithoutRef } from "react"
+import { toMaybeFiniteNumber } from "../common/to-maybe-finite-number"
 
 type NumberInputProps = {
   defaultValue: number
@@ -10,6 +11,11 @@ export function NumberInput({
   onChange,
   ...props
 }: NumberInputProps) {
+  const updateValue = (value: number, element: HTMLInputElement) => {
+    onChange(value)
+    element.value = value.toString()
+  }
+
   return (
     <input
       {...props}
@@ -18,12 +24,25 @@ export function NumberInput({
       onFocus={(event) => {
         props.onFocus?.(event)
         if (event.isDefaultPrevented()) return
-        event.target.select()
+        event.currentTarget.select()
       }}
       onChange={(event) => {
-        const value = Number(event.target.value)
-        if (!Number.isNaN(value)) {
-          onChange(value)
+        onChange(toMaybeFiniteNumber(event.currentTarget.value) ?? 0)
+      }}
+      onKeyDown={(event) => {
+        props.onKeyDown?.(event)
+        if (event.isDefaultPrevented()) return
+
+        const value = toMaybeFiniteNumber(event.currentTarget.value) ?? 0
+        const step = event.shiftKey ? 100 : event.altKey ? 1 : 10
+
+        if (event.key === "ArrowUp") {
+          updateValue(value + step, event.currentTarget)
+          event.preventDefault()
+        }
+        if (event.key === "ArrowDown") {
+          updateValue(value - step, event.currentTarget)
+          event.preventDefault()
         }
       }}
     />
