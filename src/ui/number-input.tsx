@@ -4,6 +4,7 @@ import { toMaybeFiniteNumber } from "../common/to-maybe-finite-number"
 type NumberInputProps = {
   defaultValue: number
   onChange: (value: number) => void
+  // TODO: min & max
 } & Omit<ComponentPropsWithoutRef<"input">, "defaultValue" | "onChange">
 
 export function NumberInput({
