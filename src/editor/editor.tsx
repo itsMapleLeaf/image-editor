@@ -7,6 +7,8 @@ import { useWindowEvent } from "../dom/use-window-event"
 import { FrameState } from "../frame/frame-state"
 import { FrameOptions } from "../frame/frame-tool"
 import { ImageUploadButton } from "../image/image-tool"
+import { Point } from "../math/point"
+import { Rect } from "../math/rect"
 import { SpriteState } from "../sprite/sprite-state"
 import { PopoverHandle } from "../ui/popover"
 import { ToolButton } from "./tool-button"
@@ -21,6 +23,11 @@ type EditorState = {
 type EditorInputState =
   | { status: "idle" }
   | { status: "movingSprite"; spriteId: string }
+  | {
+      status: "resizingSprite"
+      spriteId: string
+      sides: Record<"left" | "top" | "right" | "bottom", boolean>
+    }
 
 export function Editor() {
   const [state, setState] = useState<EditorState>({
@@ -72,22 +79,79 @@ export function Editor() {
       if (!isInFrame) return
 
       const frame = frameRef.current!.getBoundingClientRect()
-      const frameX = event.clientX - frame.left
-      const frameY = event.clientY - frame.top
 
-      // prettier-ignore
-      const selected = [...state.sprites].reverse().find((sprite) => (
-        frameX >= sprite.left &&
-        frameX <= sprite.left + sprite.width &&
-        frameY >= sprite.top &&
-        frameY <= sprite.top + sprite.height
-      ))
+      const localMouse = new Point(
+        event.clientX - frame.left,
+        event.clientY - frame.top,
+      )
+
+      // the half-width of the resizing clickable area on each edge of a sprite
+      const resizeExtent = new Point(20)
+
+      const inputResult = [...state.sprites]
+        .reverse()
+        .map((sprite) => {
+          const { rect } = sprite
+
+          const selected = rect.contains(localMouse)
+
+          const outerResizeExtent = rect.extendedBy(resizeExtent)
+          const innerResizeExtent = rect.shrunkBy(resizeExtent)
+
+          const leftResizeArea = new Rect(
+            new Point(resizeExtent.x * 2, outerResizeExtent.height),
+            new Point(outerResizeExtent.left, outerResizeExtent.top),
+          )
+          const rightResizeArea = new Rect(
+            new Point(resizeExtent.x * 2, outerResizeExtent.height),
+            new Point(innerResizeExtent.right, outerResizeExtent.top),
+          )
+          const topResizeArea = new Rect(
+            new Point(outerResizeExtent.width, resizeExtent.y * 2),
+            new Point(outerResizeExtent.left, outerResizeExtent.top),
+          )
+          const bottomResizeArea = new Rect(
+            new Point(outerResizeExtent.width, resizeExtent.y * 2),
+            new Point(outerResizeExtent.left, innerResizeExtent.bottom),
+          )
+          // debugger
+          const resizingSides = {
+            left: leftResizeArea.contains(localMouse),
+            right: rightResizeArea.contains(localMouse),
+            top: topResizeArea.contains(localMouse),
+            bottom: bottomResizeArea.contains(localMouse),
+          }
+
+          console.log(resizingSides)
+
+          return {
+            sprite,
+            selected,
+            resizingSides,
+            isResizing: Object.values(resizingSides).some(Boolean),
+          }
+        })
+        .find((result) => result.selected || result.isResizing)
 
       setState(
         produce((draft) => {
-          draft.selectedSpriteId = selected?.id
-          if (selected) {
-            draft.input = { status: "movingSprite", spriteId: selected?.id }
+          draft.selectedSpriteId = inputResult?.sprite.id
+
+          if (inputResult?.isResizing) {
+            draft.input = {
+              status: "resizingSprite",
+              spriteId: inputResult.sprite.id,
+              sides: inputResult.resizingSides,
+            }
+            return
+          }
+
+          if (inputResult?.selected) {
+            draft.input = {
+              status: "movingSprite",
+              spriteId: inputResult.sprite?.id,
+            }
+            return
           }
         }),
       )
@@ -105,15 +169,45 @@ export function Editor() {
 
           // this is naiive and breaks in some instances,
           // but is good enough for MVP
-          sprite.left += event.movementX
-          sprite.top += event.movementY
+          sprite.rect = sprite.rect.movedBy(
+            new Point(event.movementX, event.movementY),
+          )
+        }),
+      )
+    }
+
+    if (state.input.status === "resizingSprite") {
+      const { spriteId, sides } = state.input
+
+      setState(
+        produce((draft) => {
+          const sprite = draft.sprites.find((sprite) => sprite.id === spriteId)
+          if (!sprite) return
+
+          // this is naiive and breaks in some instances,
+          // but is good enough for MVP
+          if (sides.left) {
+            sprite.rect = sprite.rect.leftShiftedBy(event.movementX)
+          }
+          if (sides.right) {
+            sprite.rect = sprite.rect.rightShiftedBy(event.movementX)
+          }
+          if (sides.top) {
+            sprite.rect = sprite.rect.topShiftedBy(event.movementY)
+          }
+          if (sides.bottom) {
+            sprite.rect = sprite.rect.bottomShiftedBy(event.movementY)
+          }
         }),
       )
     }
   })
 
   useWindowEvent("mouseup", () => {
-    if (state.input.status === "movingSprite") {
+    if (
+      state.input.status === "movingSprite" ||
+      state.input.status === "resizingSprite"
+    ) {
       setState({ ...state, input: { status: "idle" } })
     }
   })
@@ -150,10 +244,10 @@ export function Editor() {
           type: "image",
           id: crypto.randomUUID(),
           image,
-          left,
-          top,
-          width: scaledWidth,
-          height: scaledHeight,
+          rect: new Rect(
+            new Point(scaledWidth, scaledHeight),
+            new Point(left, top),
+          ),
         },
       ],
     })
@@ -205,14 +299,21 @@ export function Editor() {
 
         {selectedSprite && (
           <div
-            className="pointer-events-none absolute border-2 border-blue-400 bg-blue-400/25"
+            className="pointer-events-none absolute"
             style={{
-              left: selectedSprite.left,
-              top: selectedSprite.top,
-              width: selectedSprite.width,
-              height: selectedSprite.height,
+              left: selectedSprite.rect.left,
+              top: selectedSprite.rect.top,
+              width: selectedSprite.rect.right - selectedSprite.rect.left,
+              height: selectedSprite.rect.bottom - selectedSprite.rect.top,
             }}
-          />
+          >
+            <div className="relative h-full bg-blue-400/25 ring-2 ring-blue-400">
+              <div className="absolute left-0 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full bg-blue-400" />
+              <div className="absolute right-0 h-3 w-3 translate-x-1/2 -translate-y-1/2 rounded-full bg-blue-400" />
+              <div className="absolute left-0 bottom-0 h-3 w-3 -translate-x-1/2 translate-y-1/2 rounded-full bg-blue-400" />
+              <div className="absolute right-0 bottom-0 h-3 w-3 translate-x-1/2 translate-y-1/2 rounded-full bg-blue-400" />
+            </div>
+          </div>
         )}
       </main>
     </div>
@@ -229,10 +330,10 @@ function SpriteList({ sprites }: { sprites: SpriteState[] }) {
           style={{
             backgroundImage: `url(${sprite.image.src})`,
             backgroundSize: "100%",
-            left: sprite.left,
-            top: sprite.top,
-            width: sprite.width,
-            height: sprite.height,
+            left: sprite.rect.left,
+            top: sprite.rect.top,
+            width: sprite.rect.right - sprite.rect.left,
+            height: sprite.rect.bottom - sprite.rect.top,
           }}
         />
       ))}
