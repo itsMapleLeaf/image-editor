@@ -19,7 +19,7 @@ export function NumberInput({
   return (
     <input
       {...props}
-      className="w-16 rounded-md bg-black/25 p-2 text-center transition focus:bg-black/50 focus:outline-none focus:ring-2 focus:ring-blue-400"
+      className="w-16 rounded-md bg-black/25 p-1.5 text-center leading-none transition focus:bg-black/50 focus:outline-none focus:ring-2 focus:ring-blue-400"
       defaultValue={defaultValue}
       onFocus={(event) => {
         props.onFocus?.(event)
