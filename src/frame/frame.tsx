@@ -1,4 +1,3 @@
-import clsx from "clsx"
 import type { ForwardedRef, ReactNode, Ref } from "react"
 import { forwardRef } from "react"
 import type { FrameState } from "./frame-state"
@@ -39,10 +38,7 @@ function FrameShade({
 }) {
   return (
     <div
-      className={clsx(
-        "relative bg-black/25 brightness-50 filter",
-        state.shape.name === "Circle" && "rounded-full",
-      )}
+      className="relative bg-black/25 brightness-50 filter"
       style={{ width: state.width, height: state.height }}
     >
       {children}
@@ -50,16 +46,14 @@ function FrameShade({
   )
 }
 
+// TODO: undo forwardRef on this and pass frameRef as regular prop
 const FrameHighlight = forwardRef(function FrameHighlight(
   { state, children }: { state: FrameState; children: ReactNode },
   ref: ForwardedRef<HTMLDivElement>,
 ) {
   return (
     <div
-      className={clsx(
-        "relative overflow-clip",
-        state.shape.name === "Circle" && "rounded-full",
-      )}
+      className="relative overflow-clip"
       style={{ width: state.width, height: state.height }}
       ref={ref}
     >

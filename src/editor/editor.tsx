@@ -2,7 +2,6 @@ import { useRef, useState } from "react"
 import { loadImage } from "../dom/load-image"
 import { useWindowEvent } from "../dom/use-window-event"
 import { Frame } from "../frame/frame"
-import { frameShapeOptions } from "../frame/frame-state"
 import { FrameTool } from "../frame/frame-tool"
 import { Sprite } from "../sprite/sprite"
 import { EditorState } from "./editor-state"
@@ -13,7 +12,6 @@ export function Editor() {
     frame: {
       width: 100,
       height: 100,
-      shape: frameShapeOptions[0],
     },
   })
 
