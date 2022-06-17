@@ -1,18 +1,39 @@
 import { Dialog, Transition } from "@headlessui/react"
 import { Placement } from "@popperjs/core"
-import { Fragment, ReactNode, useState } from "react"
+import {
+  ForwardedRef,
+  forwardRef,
+  Fragment,
+  ReactNode,
+  useImperativeHandle,
+  useState,
+} from "react"
 import { Popper, PopperReferenceProps } from "./popper"
 
-export function Popover(props: {
-  button: (
-    props: PopperReferenceProps & {
-      onClick: () => void
-    },
-  ) => ReactNode
-  panel: ReactNode
-  placement: Placement
-}) {
+export type PopoverHandle = {
+  open: () => void
+  close: () => void
+}
+
+export const Popover = forwardRef(function Popover(
+  props: {
+    button: (
+      props: PopperReferenceProps & {
+        onClick: () => void
+      },
+    ) => ReactNode
+    panel: ReactNode
+    placement: Placement
+  },
+  ref: ForwardedRef<PopoverHandle>,
+) {
   const [isOpen, setIsOpen] = useState(false)
+
+  useImperativeHandle(ref, () => ({
+    open: () => setIsOpen(true),
+    close: () => setIsOpen(false),
+  }))
+
   return (
     <Popper placement={props.placement}>
       {({ reference, popper }) => (
@@ -54,4 +75,4 @@ export function Popover(props: {
       )}
     </Popper>
   )
-}
+})
