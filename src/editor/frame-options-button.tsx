@@ -18,7 +18,7 @@ export function FrameOptionsButton({
         </Button>
       }
       panel={
-        <EditorToolPanel>
+        <EditorToolPanel title="Frame">
           <EditorToolPanelSection title="Shape">
             {shapeOptions}
           </EditorToolPanelSection>

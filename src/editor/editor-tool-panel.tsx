@@ -1,10 +1,21 @@
 import type { ReactNode } from "react"
 import { RaisedPanel } from "../ui/raised-panel"
 
-export function EditorToolPanel({ children }: { children: React.ReactNode }) {
+export function EditorToolPanel({
+  title,
+  children,
+}: {
+  title: ReactNode
+  children: React.ReactNode
+}) {
   return (
     <RaisedPanel>
-      <div className="flex flex-col gap-2 p-2">{children}</div>
+      <section>
+        <h2 className="select-none border-b-2 border-slate-900 bg-slate-900/50 pb-2 pt-2.5 text-center text-sm font-bold leading-none text-slate-100/75">
+          {title}
+        </h2>
+        <div className="flex flex-col gap-2 p-2">{children}</div>
+      </section>
     </RaisedPanel>
   )
 }
