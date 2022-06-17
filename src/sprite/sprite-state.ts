@@ -4,4 +4,6 @@ export type SpriteState = {
   image: HTMLImageElement
   left: number
   top: number
+  width: number
+  height: number
 }

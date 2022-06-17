@@ -2,15 +2,15 @@ import type { SpriteState } from "./sprite-state"
 
 export function Sprite({ sprite }: { sprite: SpriteState }) {
   return (
-    <img
-      alt=""
-      src={sprite.image.src}
+    <div
       className="absolute"
       style={{
+        backgroundImage: `url(${sprite.image.src})`,
+        backgroundSize: "100%",
         left: sprite.left,
         top: sprite.top,
-        minWidth: sprite.image.width,
-        minHeight: sprite.image.height,
+        width: sprite.width,
+        height: sprite.height,
       }}
     />
   )
