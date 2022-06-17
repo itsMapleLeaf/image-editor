@@ -1,7 +1,8 @@
-import { mdiVectorRectangle } from "@mdi/js"
+import { mdiClose, mdiVectorRectangle } from "@mdi/js"
 import { Icon } from "@mdi/react"
 import { ToolPanel, ToolPanelSection } from "../editor/tool-panel"
 import { Button } from "../ui/button"
+import { NumberInput } from "../ui/number-input"
 import { Popover } from "../ui/popover"
 import { frameShapeOptions, FrameState } from "./frame-state"
 
@@ -14,11 +15,11 @@ export function FrameTool({
 }) {
   return (
     <Popover
-      button={
-        <Button>
+      button={(props) => (
+        <Button {...props}>
           <Icon title="Frame" path={mdiVectorRectangle} className="w-8" />
         </Button>
-      }
+      )}
       panel={
         <ToolPanel title="Frame">
           <ToolPanelSection title="Shape">
@@ -35,8 +36,21 @@ export function FrameTool({
               ))}
             </div>
           </ToolPanelSection>
-          <ToolPanelSection title="Size">TODO</ToolPanelSection>
-          <ToolPanelSection title="Aspect ratio">TODO</ToolPanelSection>
+          <ToolPanelSection title="Size">
+            <div className="flex items-center gap-1">
+              <NumberInput
+                title="Width"
+                defaultValue={frame.width}
+                onChange={(width) => onChange({ ...frame, width })}
+              />
+              <Icon path={mdiClose} className="w-4" />
+              <NumberInput
+                title="Height"
+                defaultValue={frame.height}
+                onChange={(height) => onChange({ ...frame, height })}
+              />
+            </div>
+          </ToolPanelSection>
         </ToolPanel>
       }
     />
