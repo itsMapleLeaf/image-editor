@@ -1,14 +1,14 @@
 import clsx from "clsx"
 import type { ForwardedRef, ReactNode, Ref } from "react"
 import { forwardRef } from "react"
-import type { FrameShape } from "./frame-shape"
+import type { FrameShape, FrameState } from "./frame-state"
 
-export function FrameView({
-  shape,
+export function Frame({
+  state,
   frameRef,
   children,
 }: {
-  shape: FrameShape
+  state: FrameState
   frameRef: Ref<HTMLDivElement>
   children: ReactNode
 }) {
@@ -16,12 +16,12 @@ export function FrameView({
     <div className="relative flex h-full overflow-auto p-4">
       <div className="absolute inset-0 flex">
         <div className="m-auto">
-          <FrameShade shape={shape}>{children}</FrameShade>
+          <FrameShade shape={state.shape}>{children}</FrameShade>
         </div>
       </div>
       <div className="absolute inset-0 flex">
         <div className="m-auto">
-          <FrameHighlight shape={shape} ref={frameRef}>
+          <FrameHighlight shape={state.shape} ref={frameRef}>
             {children}
           </FrameHighlight>
         </div>
