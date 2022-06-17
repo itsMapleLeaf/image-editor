@@ -38,14 +38,36 @@ export function Editor() {
     const image = await loadImage(URL.createObjectURL(file))
     const frame = frameRef.current!
     const rect = frame.getBoundingClientRect()
-    const left = event.pageX - rect.left - image.width / 2
-    const top = event.pageY - rect.top - image.height / 2
+
+    // the scale of the image compared to the frame
+    const imageScaleHorizontal = image.width / rect.width
+    const imageScaleVertical = image.height / rect.height
+
+    const containMultiplier = Math.min(
+      1 / imageScaleHorizontal,
+      1 / imageScaleVertical,
+      1,
+    )
+
+    const scaledWidth = image.width * containMultiplier
+    const scaledHeight = image.height * containMultiplier
+
+    const left = rect.width / 2 - scaledWidth / 2
+    const top = rect.height / 2 - scaledHeight / 2
 
     setState({
       ...state,
       sprites: [
         ...state.sprites,
-        { type: "image", id: crypto.randomUUID(), image, left, top },
+        {
+          type: "image",
+          id: crypto.randomUUID(),
+          image,
+          left,
+          top,
+          width: scaledWidth,
+          height: scaledHeight,
+        },
       ],
     })
   })
