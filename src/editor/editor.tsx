@@ -1,10 +1,15 @@
+import { mdiImage, mdiVectorRectangle } from "@mdi/js"
+import { Icon } from "@mdi/react"
 import { useRef, useState } from "react"
 import { loadImage } from "../dom/load-image"
 import { useWindowEvent } from "../dom/use-window-event"
 import { Frame } from "../frame/frame"
-import { FrameTool } from "../frame/frame-tool"
+import { FrameOptions } from "../frame/frame-tool"
+import { ImageUploadButton } from "../image/image-tool"
 import { Sprite } from "../sprite/sprite"
+import { PopoverHandle } from "../ui/popover"
 import { EditorState } from "./editor-state"
+import { ToolButton } from "./tool-button"
 
 export function Editor() {
   const [state, setState] = useState<EditorState>({
@@ -16,6 +21,7 @@ export function Editor() {
   })
 
   const frameRef = useRef<HTMLDivElement>(null)
+  const imagePopoverRef = useRef<PopoverHandle>(null)
 
   useWindowEvent("dragenter", (event) => event.preventDefault())
   useWindowEvent("dragleave", (event) => event.preventDefault())
@@ -33,9 +39,13 @@ export function Editor() {
     event.preventDefault()
 
     const file = event.dataTransfer?.files[0]
-    if (!file?.type.startsWith("image/")) return
+    if (file) addImageSprite(file)
+  })
 
-    const image = await loadImage(URL.createObjectURL(file))
+  const addImageSprite = async (blob: Blob) => {
+    if (!blob.type.startsWith("image/")) return
+
+    const image = await loadImage(URL.createObjectURL(blob))
     const frame = frameRef.current!
     const rect = frame.getBoundingClientRect()
 
@@ -46,6 +56,7 @@ export function Editor() {
     const containMultiplier = Math.min(
       1 / imageScaleHorizontal,
       1 / imageScaleVertical,
+      // don't want to scale the image up if it's already smaller than the frame
       1,
     )
 
@@ -70,16 +81,30 @@ export function Editor() {
         },
       ],
     })
-  })
+
+    imagePopoverRef.current?.close()
+  }
 
   return (
     <div className="fixed inset-0 flex flex-row">
       <nav>
         <ToolList>
-          <FrameTool
-            frame={state.frame}
-            onChange={(frame) => setState({ ...state, frame })}
-          />
+          <ToolButton
+            name="Frame"
+            icon={<Icon path={mdiVectorRectangle} className="w-8" />}
+          >
+            <FrameOptions
+              frame={state.frame}
+              onChange={(frame) => setState({ ...state, frame })}
+            />
+          </ToolButton>
+          <ToolButton
+            name="Image"
+            icon={<Icon path={mdiImage} className="w-8" />}
+            popoverRef={imagePopoverRef}
+          >
+            <ImageUploadButton onUpload={addImageSprite} />
+          </ToolButton>
         </ToolList>
       </nav>
       <main className="min-w-0 flex-1">

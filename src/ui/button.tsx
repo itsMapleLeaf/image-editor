@@ -1,27 +1,34 @@
 import clsx from "clsx"
-import type { ComponentPropsWithoutRef } from "react"
 import { forwardRef } from "react"
 
 export const Button = forwardRef(function Button(
   {
+    label,
+    icon,
     active,
-    ...props
-  }: ComponentPropsWithoutRef<"button"> & {
+    onClick,
+  }: {
+    label?: React.ReactNode
     active?: boolean
+    icon?: React.ReactNode
+    onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void
   },
   ref: React.Ref<HTMLButtonElement>,
 ) {
   return (
     <button
       type="button"
-      {...props}
       ref={ref}
       className={clsx(
-        "rounded-md p-1 ring-2 ring-transparent transition-colors  focus:outline-none focus-visible:ring-blue-400",
+        "flex items-center gap-2 rounded p-2 font-medium leading-none ring-2 ring-transparent transition focus:outline-none focus-visible:ring-blue-400",
         active
           ? "bg-slate-600"
           : "bg-slate-700 text-slate-50/40 hover:text-slate-50",
       )}
-    />
+      onClick={onClick}
+    >
+      {icon && <span className="-m-1">{icon}</span>}
+      {label}
+    </button>
   )
 })
