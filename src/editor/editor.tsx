@@ -329,7 +329,8 @@ function SpriteList({ sprites }: { sprites: SpriteState[] }) {
           className="absolute cursor-pointer"
           style={{
             backgroundImage: `url(${sprite.image.src})`,
-            backgroundSize: "100%",
+            backgroundPosition: "center",
+            backgroundSize: "cover",
             left: sprite.rect.left,
             top: sprite.rect.top,
             width: sprite.rect.right - sprite.rect.left,
