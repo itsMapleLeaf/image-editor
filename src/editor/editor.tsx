@@ -3,12 +3,18 @@ import { Icon } from "@mdi/react"
 import { useRef, useState } from "react"
 import { loadImage } from "../dom/load-image"
 import { useWindowEvent } from "../dom/use-window-event"
+import { FrameState } from "../frame/frame-state"
 import { FrameOptions } from "../frame/frame-tool"
 import { ImageUploadButton } from "../image/image-tool"
 import { SpriteState } from "../sprite/sprite-state"
 import { PopoverHandle } from "../ui/popover"
-import { EditorState } from "./editor-state"
 import { ToolButton } from "./tool-button"
+
+type EditorState = {
+  frame: FrameState
+  sprites: SpriteState[]
+  selectedSpriteId?: string
+}
 
 export function Editor() {
   const [state, setState] = useState<EditorState>({
