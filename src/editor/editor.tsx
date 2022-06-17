@@ -1,5 +1,6 @@
 import { mdiImage, mdiVectorRectangle } from "@mdi/js"
 import { Icon } from "@mdi/react"
+import produce from "immer"
 import { useRef, useState } from "react"
 import { loadImage } from "../dom/load-image"
 import { useWindowEvent } from "../dom/use-window-event"
@@ -13,8 +14,13 @@ import { ToolButton } from "./tool-button"
 type EditorState = {
   frame: FrameState
   sprites: SpriteState[]
+  input: EditorInputState
   selectedSpriteId?: string
 }
+
+type EditorInputState =
+  | { status: "idle" }
+  | { status: "movingSprite"; spriteId: string }
 
 export function Editor() {
   const [state, setState] = useState<EditorState>({
@@ -23,12 +29,14 @@ export function Editor() {
       width: 640,
       height: 360,
     },
+    input: { status: "idle" },
   })
 
   const selectedSprite = state.sprites.find(
     (sprite) => state.selectedSpriteId === sprite.id,
   )
 
+  const viewportRef = useRef<HTMLDivElement>(null)
   const frameRef = useRef<HTMLDivElement>(null)
   const imagePopoverRef = useRef<PopoverHandle>(null)
 
@@ -51,24 +59,63 @@ export function Editor() {
     if (file) addImageSprite(file)
   })
 
-  useWindowEvent("click", (event) => {
-    const frame = frameRef.current!
-    const frameRect = frame.getBoundingClientRect()
-    const frameX = event.clientX - frameRect.left
-    const frameY = event.clientY - frameRect.top
+  useWindowEvent("mousedown", (event) => {
+    if (state.input.status === "idle") {
+      const viewport = viewportRef.current!.getBoundingClientRect()
 
-    // prettier-ignore
-    const selectedSprite = [...state.sprites].reverse().find((sprite) => (
-      frameX >= sprite.left &&
-      frameX <= sprite.left + sprite.width &&
-      frameY >= sprite.top &&
-      frameY <= sprite.top + sprite.height
-    ))
+      const isInFrame =
+        event.clientX >= viewport.left &&
+        event.clientX <= viewport.right &&
+        event.clientY >= viewport.top &&
+        event.clientY <= viewport.bottom
 
-    setState({
-      ...state,
-      selectedSpriteId: selectedSprite?.id,
-    })
+      if (!isInFrame) return
+
+      const frame = frameRef.current!.getBoundingClientRect()
+      const frameX = event.clientX - frame.left
+      const frameY = event.clientY - frame.top
+
+      // prettier-ignore
+      const selected = [...state.sprites].reverse().find((sprite) => (
+        frameX >= sprite.left &&
+        frameX <= sprite.left + sprite.width &&
+        frameY >= sprite.top &&
+        frameY <= sprite.top + sprite.height
+      ))
+
+      setState(
+        produce((draft) => {
+          draft.selectedSpriteId = selected?.id
+          if (selected) {
+            draft.input = { status: "movingSprite", spriteId: selected?.id }
+          }
+        }),
+      )
+    }
+  })
+
+  useWindowEvent("mousemove", (event) => {
+    if (state.input.status === "movingSprite") {
+      const { spriteId } = state.input
+
+      setState(
+        produce((draft) => {
+          const sprite = draft.sprites.find((sprite) => sprite.id === spriteId)
+          if (!sprite) return
+
+          // this is naiive and breaks in some instances,
+          // but is good enough for MVP
+          sprite.left += event.movementX
+          sprite.top += event.movementY
+        }),
+      )
+    }
+  })
+
+  useWindowEvent("mouseup", () => {
+    if (state.input.status === "movingSprite") {
+      setState({ ...state, input: { status: "idle" } })
+    }
   })
 
   const addImageSprite = async (blob: Blob) => {
@@ -137,7 +184,7 @@ export function Editor() {
         </ToolList>
       </nav>
 
-      <main className="relative min-w-0 flex-1">
+      <main className="relative min-w-0 flex-1 overflow-clip" ref={viewportRef}>
         <div
           ref={frameRef}
           className="absolute bg-black/25"

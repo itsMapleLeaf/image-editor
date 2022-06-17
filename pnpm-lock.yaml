@@ -16,6 +16,7 @@ specifiers:
   c8: ^7.11.3
   clsx: ^1.1.1
   eslint: ^8.17.0
+  immer: ^9.0.15
   postcss: ^8.4.14
   prettier: ^2.7.0
   prettier-plugin-tailwindcss: ^0.1.11
@@ -33,6 +34,7 @@ dependencies:
   '@mdi/react': 1.6.0
   '@popperjs/core': 2.11.5
   clsx: 1.1.1
+  immer: 9.0.15
   react: 18.2.0
   react-dom: 18.2.0_react@18.2.0
   react-popper: 2.3.0_ili5ylfne7i3hkfpsanzgkfu6m
@@ -2109,6 +2111,10 @@ packages:
     resolution: {integrity: sha512-CmxgYGiEPCLhfLnpPp1MoRmifwEIOgjcHXxOBjv7mY96c+eWScsOP9c112ZyLdWHi0FxHjI+4uVhKYp/gcdRmQ==}
     engines: {node: '>= 4'}
     dev: true
+
+  /immer/9.0.15:
+    resolution: {integrity: sha512-2eB/sswms9AEUSkOm4SbV5Y7Vmt/bKRwByd52jfLkW4OLYeaTP3EEiJ9agqU0O/tq6Dk62Zfj+TJSqfm1rLVGQ==}
+    dev: false
 
   /import-fresh/3.3.0:
     resolution: {integrity: sha512-veYYhQa+D1QBKznvhUHxb8faxlrwUnxseDAbAp457E0wLNio2bOSKnjYDhMj+YiAq61xrMGhQk9iXVk5FzgQMw==}
