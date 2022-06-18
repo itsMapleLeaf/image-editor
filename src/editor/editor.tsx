@@ -1,7 +1,7 @@
 import { mdiImage, mdiVectorRectangle } from "@mdi/js"
 import { Icon } from "@mdi/react"
 import produce from "immer"
-import { useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { loadImage } from "../dom/load-image"
 import { useWindowEvent } from "../dom/use-window-event"
 import { FrameState } from "../frame/frame-state"
@@ -16,18 +16,20 @@ import { ToolButton } from "./tool-button"
 type EditorState = {
   frame: FrameState
   sprites: SpriteState[]
-  input: EditorInputState
   selectedSpriteId?: string
+  input: EditorInputState
 }
 
 type EditorInputState =
   | { status: "idle" }
-  | { status: "movingSprite"; spriteId: string }
-  | {
-      status: "resizingSprite"
-      spriteId: string
-      sides: Record<"left" | "top" | "right" | "bottom", boolean>
-    }
+  | { status: "hovering"; spriteId: string; intent: SpriteIntent }
+  | { status: "editing"; spriteId: string; intent: SpriteIntent }
+
+type SpriteIntent = {
+  spriteId: string
+  moving: boolean
+  resizing: Record<"left" | "top" | "right" | "bottom", boolean>
+}
 
 export function Editor() {
   const [state, setState] = useState<EditorState>({
@@ -66,8 +68,8 @@ export function Editor() {
     if (file) addImageSprite(file)
   })
 
-  useWindowEvent("mousedown", (event) => {
-    if (state.input.status === "idle") {
+  useWindowEvent("mousemove", (event) => {
+    if (state.input.status === "idle" || state.input.status === "hovering") {
       const viewport = viewportRef.current!.getBoundingClientRect()
 
       const isInFrame =
@@ -114,102 +116,120 @@ export function Editor() {
             new Point(outerResizeExtent.width, resizeExtent.y * 2),
             new Point(outerResizeExtent.left, innerResizeExtent.bottom),
           )
-          // debugger
-          const resizingSides = {
+
+          const resizing = {
             left: leftResizeArea.contains(localMouse),
             right: rightResizeArea.contains(localMouse),
             top: topResizeArea.contains(localMouse),
             bottom: bottomResizeArea.contains(localMouse),
           }
 
-          console.log(resizingSides)
+          const intent: SpriteIntent = {
+            spriteId: sprite.id,
+            moving: selected,
+            resizing,
+          }
 
           return {
             sprite,
-            selected,
-            resizingSides,
-            isResizing: Object.values(resizingSides).some(Boolean),
+            intent,
+            isResizing: Object.values(resizing).some((v) => v),
           }
         })
-        .find((result) => result.selected || result.isResizing)
+        .find((result) => result.intent.moving || result.isResizing)
 
       setState(
         produce((draft) => {
-          draft.selectedSpriteId = inputResult?.sprite.id
-
-          if (inputResult?.isResizing) {
+          if (inputResult) {
             draft.input = {
-              status: "resizingSprite",
+              status: "hovering",
               spriteId: inputResult.sprite.id,
-              sides: inputResult.resizingSides,
+              intent: inputResult.intent,
+            }
+          } else {
+            draft.input = { status: "idle" }
+          }
+        }),
+      )
+    }
+
+    if (state.input.status === "editing") {
+      const { spriteId, intent } = state.input
+
+      setState(
+        produce((draft) => {
+          const sprite = draft.sprites.find((sprite) => sprite.id === spriteId)
+          if (!sprite) return
+
+          // this is naiive and breaks in some instances,
+          // but is good enough for MVP
+          if (Object.values(intent.resizing).some(Boolean)) {
+            const sides = intent.resizing
+            if (sides.left) {
+              sprite.rect = sprite.rect.leftShiftedBy(event.movementX)
+            }
+            if (sides.right) {
+              sprite.rect = sprite.rect.rightShiftedBy(event.movementX)
+            }
+            if (sides.top) {
+              sprite.rect = sprite.rect.topShiftedBy(event.movementY)
+            }
+            if (sides.bottom) {
+              sprite.rect = sprite.rect.bottomShiftedBy(event.movementY)
             }
             return
           }
 
-          if (inputResult?.selected) {
-            draft.input = {
-              status: "movingSprite",
-              spriteId: inputResult.sprite?.id,
-            }
-            return
+          if (intent.moving) {
+            sprite.rect = sprite.rect.movedBy(
+              new Point(event.movementX, event.movementY),
+            )
           }
         }),
       )
     }
   })
 
-  useWindowEvent("mousemove", (event) => {
-    if (state.input.status === "movingSprite") {
-      const { spriteId } = state.input
-
+  useWindowEvent("mousedown", (event) => {
+    if (state.input.status === "hovering") {
+      const { spriteId, intent } = state.input
       setState(
         produce((draft) => {
-          const sprite = draft.sprites.find((sprite) => sprite.id === spriteId)
-          if (!sprite) return
-
-          // this is naiive and breaks in some instances,
-          // but is good enough for MVP
-          sprite.rect = sprite.rect.movedBy(
-            new Point(event.movementX, event.movementY),
-          )
+          draft.selectedSpriteId = spriteId
+          draft.input = { status: "editing", spriteId, intent }
         }),
       )
     }
 
-    if (state.input.status === "resizingSprite") {
-      const { spriteId, sides } = state.input
-
-      setState(
-        produce((draft) => {
-          const sprite = draft.sprites.find((sprite) => sprite.id === spriteId)
-          if (!sprite) return
-
-          // this is naiive and breaks in some instances,
-          // but is good enough for MVP
-          if (sides.left) {
-            sprite.rect = sprite.rect.leftShiftedBy(event.movementX)
-          }
-          if (sides.right) {
-            sprite.rect = sprite.rect.rightShiftedBy(event.movementX)
-          }
-          if (sides.top) {
-            sprite.rect = sprite.rect.topShiftedBy(event.movementY)
-          }
-          if (sides.bottom) {
-            sprite.rect = sprite.rect.bottomShiftedBy(event.movementY)
-          }
-        }),
-      )
+    if (state.input.status === "idle") {
+      setState({ ...state, selectedSpriteId: undefined })
     }
   })
 
   useWindowEvent("mouseup", () => {
-    if (
-      state.input.status === "movingSprite" ||
-      state.input.status === "resizingSprite"
-    ) {
+    if (state.input.status === "editing") {
       setState({ ...state, input: { status: "idle" } })
     }
+  })
+
+  useEffect(() => {
+    const getCursor = () => {
+      if (
+        state.input.status === "hovering" ||
+        state.input.status === "editing"
+      ) {
+        const { moving, resizing } = state.input.intent
+        if (resizing.top && resizing.left) return "nw-resize"
+        if (resizing.top && resizing.right) return "ne-resize"
+        if (resizing.bottom && resizing.left) return "sw-resize"
+        if (resizing.bottom && resizing.right) return "se-resize"
+        if (resizing.left || resizing.right) return "ew-resize"
+        if (resizing.top || resizing.bottom) return "ns-resize"
+        if (moving) return "move"
+      }
+    }
+
+    document.body.style.cursor = getCursor() || "default"
   })
 
   const addImageSprite = async (blob: Blob) => {
@@ -326,7 +346,7 @@ function SpriteList({ sprites }: { sprites: SpriteState[] }) {
       {sprites.map((sprite) => (
         <div
           key={sprite.id}
-          className="absolute cursor-pointer"
+          className="absolute"
           style={{
             backgroundImage: `url(${sprite.image.src})`,
             backgroundPosition: "center",
