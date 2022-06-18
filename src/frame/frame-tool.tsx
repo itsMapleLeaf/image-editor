@@ -1,15 +1,14 @@
 import { mdiClose } from "@mdi/js"
 import { Icon } from "@mdi/react"
+import { observer } from "mobx-react-lite"
 import { ToolPanelSection } from "../editor/tool-panel"
 import { NumberInput } from "../ui/number-input"
-import { FrameState } from "./frame-state"
+import type { FrameState } from "./frame-state"
 
-export function FrameOptions({
+export const FrameOptions = observer(function FrameOptions({
   frame,
-  onChange,
 }: {
   frame: FrameState
-  onChange: (frame: FrameState) => void
 }) {
   return (
     <ToolPanelSection title="Size">
@@ -17,15 +16,15 @@ export function FrameOptions({
         <NumberInput
           title="Width"
           defaultValue={frame.width}
-          onChange={(width) => onChange({ ...frame, width })}
+          onChange={frame.setWidth}
         />
         <Icon path={mdiClose} className="w-4" />
         <NumberInput
           title="Height"
           defaultValue={frame.height}
-          onChange={(height) => onChange({ ...frame, height })}
+          onChange={frame.setHeight}
         />
       </div>
     </ToolPanelSection>
   )
-}
+})

@@ -1,7 +1,29 @@
 import { Point } from "./point"
 
+type RectArgs =
+  | [size: Point]
+  | [position: Point, size: Point]
+  | [left: number, top: number, width: number, height: number]
+
 export class Rect {
-  constructor(readonly size: Point, readonly position = new Point(0, 0)) {}
+  static of(...args: RectArgs) {
+    if (args.length === 1) {
+      return new Rect(...args)
+    }
+
+    if (args.length === 2) {
+      const [position, size] = args
+      return new Rect(size, position)
+    }
+
+    const [left, top, width, height] = args
+    return new Rect(new Point(width, height), new Point(left, top))
+  }
+
+  private constructor(
+    readonly size: Point,
+    readonly position = new Point(0, 0),
+  ) {}
 
   get left() {
     return this.position.x
