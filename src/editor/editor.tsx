@@ -70,7 +70,7 @@ export const Editor = observer(function Editor({
 function ToolList({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex h-full flex-col overflow-y-auto bg-slate-800 p-2">
-      <div className="my-auto flex flex-col gap-2">{children}</div>
+      <div className="flex flex-col gap-2">{children}</div>
     </div>
   )
 }
