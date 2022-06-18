@@ -51,7 +51,7 @@ export const Editor = observer(function Editor({
   useWindowEvent("pointermove", (event) => {
     editor.handlePointerMove(new Point(event.movementX, event.movementY))
 
-    const result = editor.findAnySpriteWithIntent(
+    const result = editor.findSpriteWithIntent(
       getFrameRelativePointerPosition(event),
     )
 
