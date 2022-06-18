@@ -25,7 +25,8 @@
     "mobx-react-lite": "^3.4.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-popper": "^2.3.0"
+    "react-popper": "^2.3.0",
+    "react-use-measure": "^2.1.1"
   },
   "devDependencies": {
     "@itsmapleleaf/configs": "^1.1.4",
