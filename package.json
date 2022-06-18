@@ -21,6 +21,8 @@
     "@popperjs/core": "^2.11.5",
     "clsx": "^1.1.1",
     "immer": "^9.0.15",
+    "mobx": "^6.6.0",
+    "mobx-react-lite": "^3.4.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-popper": "^2.3.0"
@@ -36,6 +38,7 @@
     "autoprefixer": "^10.4.7",
     "c8": "^7.11.3",
     "eslint": "^8.17.0",
+    "eslint-plugin-mobx": "^0.0.8",
     "postcss": "^8.4.14",
     "prettier": "^2.7.0",
     "prettier-plugin-tailwindcss": "^0.1.11",
