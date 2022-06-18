@@ -43,10 +43,8 @@ export class EditorState {
 
   handlePointerDown(position: Point) {
     const result = this.findSpriteWithIntent(position)
-    if (!result) return
-
-    this.selectedSpriteId = result.sprite.id
-    this.activeSpriteIntent = result.intent
+    this.selectedSpriteId = result?.sprite.id
+    this.activeSpriteIntent = result?.intent
   }
 
   handlePointerMove(delta: Point) {
