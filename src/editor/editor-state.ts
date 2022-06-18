@@ -26,17 +26,7 @@ export class EditorState {
     this.sprites.push(sprite)
   }
 
-  handlePointerDown(position: Point) {
-    const result = this.findSpriteWithIntent(position)
-    if (!result) return
-
-    this.selectedSpriteId = result.sprite.id
-    this.activeSpriteIntent = result.intent
-  }
-
-  private findSpriteWithIntent(
-    position: Point,
-  ): SpriteIntentResult | undefined {
+  findSpriteWithIntent(position: Point): SpriteIntentResult | undefined {
     // if there's already a sprite selected, try to find an intent on that first
     if (this.selectedSprite) {
       const intent = this.selectedSprite.getPointerIntent(position)
@@ -45,14 +35,18 @@ export class EditorState {
 
     // otherwise, find another sprite with an intent,
     // but go back to front, so we check sprites on top first
-    return this.findAnySpriteWithIntent(position)
-  }
-
-  findAnySpriteWithIntent(position: Point): SpriteIntentResult | undefined {
     for (const sprite of [...this.sprites].reverse()) {
       const intent = sprite.getPointerIntent(position)
       if (intent) return { sprite, intent }
     }
+  }
+
+  handlePointerDown(position: Point) {
+    const result = this.findSpriteWithIntent(position)
+    if (!result) return
+
+    this.selectedSpriteId = result.sprite.id
+    this.activeSpriteIntent = result.intent
   }
 
   handlePointerMove(delta: Point) {
