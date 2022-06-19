@@ -1,6 +1,7 @@
 import { observer } from "mobx-react-lite"
 import { useState } from "react"
 import useMeasure from "react-use-measure"
+import { useWindowEvent } from "../dom/use-window-event"
 import { Point } from "../math/point"
 import type { EditorState } from "./editor-state"
 
@@ -32,20 +33,23 @@ export const EditorViewport = observer(function EditorViewport({
     if (result?.intent === "move") return "move"
   }
 
+  useWindowEvent("pointermove", (event) => {
+    editor.handlePointerMove(new Point(event.movementX, event.movementY))
+    setPointer(getFrameRelativePointerPosition(event))
+  })
+
+  useWindowEvent("pointerup", () => {
+    editor.handlePointerUp()
+  })
+
   return (
     <div
       ref={frameRef}
       className="relative h-full overflow-clip"
       style={{ cursor: getCursor() }}
+      // only capture pointerDown inside the frame
       onPointerDown={(event) => {
         editor.handlePointerDown(getFrameRelativePointerPosition(event))
-      }}
-      onPointerMove={(event) => {
-        editor.handlePointerMove(new Point(event.movementX, event.movementY))
-        setPointer(getFrameRelativePointerPosition(event))
-      }}
-      onPointerUp={() => {
-        editor.handlePointerUp()
       }}
     >
       {children}
