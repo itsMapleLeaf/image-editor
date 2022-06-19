@@ -10,7 +10,6 @@ import { FileDropzone } from "../ui/file-dropzone"
 import type { PopoverHandle } from "../ui/popover"
 import { EditorCanvas } from "./editor-canvas"
 import type { EditorState } from "./editor-state"
-import { EditorViewport } from "./editor-viewport"
 import { ToolButton } from "./tool-button"
 
 export const Editor = observer(function Editor({
@@ -57,9 +56,7 @@ export const Editor = observer(function Editor({
 
       <main className="min-w-0 flex-1">
         <FileDropzone onDrop={addImageSprite}>
-          <EditorViewport editor={editor}>
-            <EditorCanvas editor={editor} />
-          </EditorViewport>
+          <EditorCanvas editor={editor} />
         </FileDropzone>
       </main>
     </div>
