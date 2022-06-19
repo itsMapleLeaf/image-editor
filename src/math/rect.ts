@@ -53,6 +53,16 @@ export class Rect {
     return this.position.plus(this.size.divide(2))
   }
 
+  get corners() {
+    const { left, top, right, bottom } = this
+    return [
+      new Point(left, top),
+      new Point(right, top),
+      new Point(right, bottom),
+      new Point(left, bottom),
+    ]
+  }
+
   contains(point: Point) {
     return (
       point.x >= this.left &&
