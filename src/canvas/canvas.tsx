@@ -90,132 +90,79 @@ function CanvasElement({
   )
 }
 
-export function FillRect(props: {
-  left?: number
-  top?: number
-  width: number
-  height: number
-  color?: string
-  alpha?: number
-}) {
+export function FillRect(props: RectProps & FillProps) {
   return (
     <CanvasElement
       render={(context) => {
-        if (props.color) context.fillStyle = props.color
-        if (props.alpha) context.globalAlpha = props.alpha
-        context.fillRect(
-          props.left ?? 0,
-          props.top ?? 0,
-          props.width,
-          props.height,
-        )
+        applyFillProps(props, context)
+        context.fillRect(...getRectArgs(props))
       }}
     />
   )
 }
 
-export function StrokeRect(props: {
-  left?: number
-  top?: number
-  width: number
-  height: number
-  color?: string
-  alpha?: number
-  lineWidth?: number
-}) {
+export function StrokeRect(props: RectProps & StrokeProps) {
   return (
     <CanvasElement
       render={(context) => {
-        context.strokeStyle = props.color || context.strokeStyle
-        context.globalAlpha = props.alpha || context.globalAlpha
-        context.lineWidth = props.lineWidth || context.lineWidth
-        context.strokeRect(
-          props.left ?? 0,
-          props.top ?? 0,
-          props.width,
-          props.height,
-        )
+        applyStrokeProps(props, context)
+        context.strokeRect(...getRectArgs(props))
       }}
     />
   )
 }
 
-export function Image(props: {
-  source: HTMLImageElement
-  left?: number
-  top?: number
-  width?: number
-  height?: number
-}) {
+export function Image(
+  props: Partial<RectProps> & { source: HTMLImageElement },
+) {
   return (
     <CanvasElement
       render={(context) => {
         context.drawImage(
           props.source,
-          props.left ?? 0,
-          props.top ?? 0,
-          props.width ?? props.source.width,
-          props.height ?? props.source.height,
+          ...getRectArgs({
+            width: props.source.width,
+            height: props.source.height,
+            ...props,
+          }),
         )
       }}
     />
   )
 }
 
-export function FillCircle(props: {
-  x: number
-  y: number
-  radius: number
-  color?: string
-  alpha?: number
-}) {
+export function FillCircle(props: ArcProps & FillProps) {
   return (
     <CanvasElement
       render={(context) => {
-        if (props.color) context.fillStyle = props.color
-        if (props.alpha) context.globalAlpha = props.alpha
+        applyFillProps(props, context)
         context.beginPath()
-        context.arc(props.x, props.y, props.radius, 0, 2 * Math.PI)
+        context.arc(...getArcArgs(props))
         context.fill()
       }}
     />
   )
 }
 
-export function StrokeCircle(props: {
-  x: number
-  y: number
-  radius: number
-  color?: string
-  alpha?: number
-  lineWidth?: number
-}) {
+export function StrokeCircle(props: ArcProps & StrokeProps) {
   return (
     <CanvasElement
       render={(context) => {
-        context.strokeStyle = props.color || context.strokeStyle
-        context.globalAlpha = props.alpha || context.globalAlpha
-        context.lineWidth = props.lineWidth || context.lineWidth
+        applyStrokeProps(props, context)
         context.beginPath()
-        context.arc(props.x, props.y, props.radius, 0, 2 * Math.PI)
+        context.arc(...getArcArgs(props))
         context.stroke()
       }}
     />
   )
 }
 
-export function ClipRect(props: {
-  left?: number
-  top?: number
-  width: number
-  height: number
-  children: React.ReactNode
-}) {
+export function ClipRect(props: RectProps & { children: React.ReactNode }) {
   return (
     <CanvasElement
       render={(context, renderChildren) => {
         context.beginPath()
-        context.rect(props.left ?? 0, props.top ?? 0, props.width, props.height)
+        context.rect(...getRectArgs(props))
         context.clip()
         renderChildren()
       }}
@@ -223,4 +170,58 @@ export function ClipRect(props: {
       {props.children}
     </CanvasElement>
   )
+}
+
+type RectProps = {
+  left?: number
+  top?: number
+  width: number
+  height: number
+}
+
+function getRectArgs({ left = 0, top = 0, width, height }: RectProps) {
+  return [left, top, width, height] as const
+}
+
+type ArcProps = {
+  x: number
+  y: number
+  radius: number
+  arcStart?: number
+  arcEnd?: number
+}
+
+function getArcArgs(props: ArcProps) {
+  return [
+    props.x,
+    props.y,
+    props.radius,
+    props.arcStart ?? 0,
+    props.arcEnd ?? Math.PI * 2,
+  ] as const
+}
+
+type FillProps = {
+  color?: string
+  alpha?: number
+}
+
+function applyFillProps(props: FillProps, context: CanvasRenderingContext2D) {
+  context.fillStyle = props.color ?? context.fillStyle
+  context.globalAlpha = props.alpha ?? context.globalAlpha
+}
+
+type StrokeProps = {
+  color?: string
+  alpha?: number
+  lineWidth?: number
+}
+
+function applyStrokeProps(
+  props: StrokeProps,
+  context: CanvasRenderingContext2D,
+) {
+  context.strokeStyle = props.color ?? context.strokeStyle
+  context.globalAlpha = props.alpha ?? context.globalAlpha
+  context.lineWidth = props.lineWidth ?? context.lineWidth
 }
