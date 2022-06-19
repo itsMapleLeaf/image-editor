@@ -1,11 +1,11 @@
-import type { MutableRefObject, RefCallback, RefObject } from "react"
+import type { MutableRefObject, Ref } from "react"
 
-export function combineRefs<T>(...refs: Array<RefCallback<T> | RefObject<T>>) {
+export function combineRefs<T>(...refs: Array<Ref<T>>) {
   return function combinedRef(element: T | null) {
     for (const ref of refs) {
       if (typeof ref === "function") {
         ref(element)
-      } else {
+      } else if (ref !== null) {
         ;(ref as MutableRefObject<T | null>).current = element
       }
     }
