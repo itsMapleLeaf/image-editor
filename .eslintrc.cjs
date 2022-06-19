@@ -21,7 +21,7 @@ module.exports = {
   },
   overrides: [
     {
-      files: ["src/{ui,react,dom}/**/*"],
+      files: ["src/{ui,react,dom,canvas}/**/*"],
       rules: {
         "mobx/missing-observer": "off",
       },
