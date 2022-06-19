@@ -1,8 +1,9 @@
 import { mdiUpload } from "@mdi/js"
-import Icon from "@mdi/react"
+import { Icon } from "@mdi/react"
 import { useRef } from "react"
 import { Button } from "../ui/button"
 
+// eslint-disable-next-line mobx/missing-observer
 export function ImageUploadButton(props: { onUpload: (file: File) => void }) {
   const inputRef = useRef<HTMLInputElement>(null)
   return (
