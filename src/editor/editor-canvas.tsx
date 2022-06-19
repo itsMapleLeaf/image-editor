@@ -1,10 +1,18 @@
 import { observer } from "mobx-react-lite"
 import { useRef, useState } from "react"
 import useMeasure from "react-use-measure"
-import { assert } from "../common/assert"
-import { useAnimationLoop } from "../dom/use-animation-loop"
+import {
+  Canvas,
+  ClipRect,
+  FillCircle,
+  FillRect,
+  Image,
+  StrokeRect,
+} from "../canvas/canvas"
+import { pick } from "../common/pick"
 import { useWindowEvent } from "../dom/use-window-event"
 import { Point } from "../math/point"
+import type { SpriteState } from "../sprite/sprite-state"
 import type { EditorState } from "./editor-state"
 
 export const EditorCanvas = observer(function EditorCanvas({
@@ -49,66 +57,6 @@ export const EditorCanvas = observer(function EditorCanvas({
     editor.handlePointerUp()
   })
 
-  useAnimationLoop(() => {
-    {
-      const canvas = assert(backgroundRef.current)
-      const context = assert(canvas.getContext("2d"))
-
-      context.clearRect(0, 0, canvas.width, canvas.height)
-
-      for (const sprite of editor.sprites) {
-        const { left, top, width, height } = sprite.rect
-        context.drawImage(sprite.image, left, top, width, height)
-      }
-    }
-
-    {
-      const canvas = assert(foregroundRef.current)
-      const context = assert(canvas.getContext("2d"))
-
-      context.clearRect(0, 0, canvas.width, canvas.height)
-
-      context.fillStyle = "rgba(0, 0, 0, 0.25)"
-      context.fillRect(0, 0, editor.frame.width, editor.frame.height)
-
-      context.save()
-
-      context.beginPath()
-      context.rect(0, 0, editor.frame.width, editor.frame.height)
-      context.clip()
-
-      for (const sprite of editor.sprites) {
-        const { left, top, width, height } = sprite.rect
-        context.drawImage(sprite.image, left, top, width, height)
-      }
-
-      context.restore()
-
-      if (editor.selectedSprite) {
-        const { left, top, width, height, corners } = editor.selectedSprite.rect
-
-        context.save()
-
-        context.fillStyle = context.strokeStyle = "rgb(96, 165, 250)"
-        context.lineWidth = 2
-
-        context.globalAlpha = 0.25
-        context.fillRect(left, top, width, height)
-
-        context.globalAlpha = 1
-        context.strokeRect(left, top, width, height)
-
-        for (const corner of corners) {
-          context.beginPath()
-          context.arc(corner.x, corner.y, 5, 0, Math.PI * 2)
-          context.fill()
-        }
-
-        context.restore()
-      }
-    }
-  })
-
   return (
     <div
       ref={containerRef}
@@ -119,18 +67,76 @@ export const EditorCanvas = observer(function EditorCanvas({
         editor.handlePointerDown(getFrameRelativePointerPosition(event))
       }}
     >
-      <canvas
-        ref={backgroundRef}
+      <Canvas
         width={containerRect.width}
         height={containerRect.height}
         className="absolute inset-0 brightness-50"
-      />
-      <canvas
-        ref={foregroundRef}
+      >
+        {editor.sprites.map((sprite) => (
+          <SpriteImage sprite={sprite} key={sprite.id} />
+        ))}
+      </Canvas>
+
+      <Canvas
         width={containerRect.width}
         height={containerRect.height}
         className="absolute inset-0"
-      />
+      >
+        <FillRect
+          width={editor.frame.width}
+          height={editor.frame.height}
+          color="rgba(0, 0, 0, 0.25)"
+        />
+
+        <ClipRect width={editor.frame.width} height={editor.frame.height}>
+          {editor.sprites.map((sprite) => (
+            <SpriteImage sprite={sprite} key={sprite.id} />
+          ))}
+        </ClipRect>
+
+        {editor.selectedSprite && (
+          <SpriteSelection sprite={editor.selectedSprite} />
+        )}
+      </Canvas>
     </div>
+  )
+})
+
+const SpriteImage = observer(function SpriteImage({
+  sprite,
+}: {
+  sprite: SpriteState
+}) {
+  return (
+    <Image
+      source={sprite.image}
+      {...pick(sprite.rect, ["left", "top", "width", "height"])}
+    />
+  )
+})
+
+const SpriteSelection = observer(function SpriteSelection({
+  sprite,
+}: {
+  sprite: SpriteState
+}) {
+  const { left, top, width, height, corners } = sprite.rect
+  const color = "rgb(96, 165, 250)"
+  const props = { left, top, width, height, color }
+
+  return (
+    <>
+      <FillRect {...props} alpha={0.25} />
+      <StrokeRect {...props} lineWidth={2} />
+      {corners.map((corner, index) => (
+        <FillCircle
+          key={index}
+          x={corner.x}
+          y={corner.y}
+          radius={5}
+          color={color}
+        />
+      ))}
+    </>
   )
 })
