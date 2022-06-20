@@ -1,6 +1,7 @@
 import type { ReactNode } from "react"
 import { RaisedPanel } from "../ui/raised-panel"
 
+// eslint-disable-next-line mobx/missing-observer
 export function ToolPanel({
   title,
   children,
@@ -20,6 +21,7 @@ export function ToolPanel({
   )
 }
 
+// eslint-disable-next-line mobx/missing-observer
 export function ToolPanelSection({
   title,
   children,

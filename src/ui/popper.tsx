@@ -1,5 +1,6 @@
-import { Placement } from "@popperjs/core"
-import { ReactNode, useState } from "react"
+import type { Placement } from "@popperjs/core"
+import type { ReactNode } from "react"
+import { useState } from "react"
 import { usePopper } from "react-popper"
 
 export type PopperReferenceProps = {

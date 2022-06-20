@@ -1,14 +1,9 @@
 import { Dialog, Transition } from "@headlessui/react"
-import { Placement } from "@popperjs/core"
-import {
-  ForwardedRef,
-  forwardRef,
-  Fragment,
-  ReactNode,
-  useImperativeHandle,
-  useState,
-} from "react"
-import { Popper, PopperReferenceProps } from "./popper"
+import type { Placement } from "@popperjs/core"
+import type { ForwardedRef, ReactNode } from "react"
+import { forwardRef, Fragment, useImperativeHandle, useState } from "react"
+import type { PopperReferenceProps } from "./popper"
+import { Popper } from "./popper"
 
 export type PopoverHandle = {
   open: () => void
