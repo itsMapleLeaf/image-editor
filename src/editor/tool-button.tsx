@@ -1,8 +1,10 @@
-import { ReactNode, Ref } from "react"
+import type { ReactNode, Ref } from "react"
 import { Button } from "../ui/button"
-import { Popover, PopoverHandle } from "../ui/popover"
+import type { PopoverHandle } from "../ui/popover"
+import { Popover } from "../ui/popover"
 import { ToolPanel } from "./tool-panel"
 
+// eslint-disable-next-line mobx/missing-observer
 export function ToolButton(props: {
   name: string
   icon: ReactNode
