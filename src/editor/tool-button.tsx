@@ -2,6 +2,7 @@ import type { ReactNode, Ref } from "react"
 import { Button } from "../ui/button"
 import type { PopoverHandle } from "../ui/popover"
 import { Popover } from "../ui/popover"
+import { Tooltip } from "../ui/tooltip"
 import { ToolPanel } from "./tool-panel"
 
 // eslint-disable-next-line mobx/missing-observer
@@ -15,11 +16,13 @@ export function ToolButton(props: {
     <Popover
       placement="right"
       button={(button) => (
-        <Button
-          {...button}
-          label={<span className="sr-only">{props.name}</span>}
-          icon={props.icon}
-        />
+        <Tooltip text={props.name} placement="right">
+          <Button
+            {...button}
+            label={<span className="sr-only">{props.name}</span>}
+            icon={props.icon}
+          />
+        </Tooltip>
       )}
       panel={<ToolPanel title={props.name}>{props.children}</ToolPanel>}
       ref={props.popoverRef}
