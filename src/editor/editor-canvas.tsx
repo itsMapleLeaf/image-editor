@@ -1,5 +1,5 @@
 import { observer } from "mobx-react-lite"
-import { useRef, useState } from "react"
+import { useState } from "react"
 import useMeasure from "react-use-measure"
 import {
   Canvas,
@@ -13,6 +13,7 @@ import { pick } from "../common/pick"
 import { useWindowEvent } from "../dom/use-window-event"
 import { Point } from "../math/point"
 import type { SpriteState } from "../sprite/sprite-state"
+import { EditorSprites } from "./editor-sprites"
 import type { EditorState } from "./editor-state"
 
 export const EditorCanvas = observer(function EditorCanvas({
@@ -21,9 +22,6 @@ export const EditorCanvas = observer(function EditorCanvas({
   editor: EditorState
 }) {
   const [containerRef, containerRect] = useMeasure()
-  const backgroundRef = useRef<HTMLCanvasElement>(null)
-  const foregroundRef = useRef<HTMLCanvasElement>(null)
-
   const [pointer, setPointer] = useState(new Point())
 
   const getFrameRelativePointerPosition = (event: {
@@ -72,9 +70,7 @@ export const EditorCanvas = observer(function EditorCanvas({
         height={containerRect.height}
         className="absolute inset-0 brightness-50"
       >
-        {editor.sprites.map((sprite) => (
-          <SpriteImage sprite={sprite} key={sprite.id} />
-        ))}
+        <EditorSprites editor={editor} />
       </Canvas>
 
       <Canvas
@@ -89,9 +85,7 @@ export const EditorCanvas = observer(function EditorCanvas({
         />
 
         <ClipRect width={editor.frame.width} height={editor.frame.height}>
-          {editor.sprites.map((sprite) => (
-            <SpriteImage sprite={sprite} key={sprite.id} />
-          ))}
+          <EditorSprites editor={editor} />
         </ClipRect>
 
         {editor.selectedSprite && (
@@ -102,7 +96,7 @@ export const EditorCanvas = observer(function EditorCanvas({
   )
 })
 
-const SpriteImage = observer(function SpriteImage({
+export const SpriteImage = observer(function SpriteImage({
   sprite,
 }: {
   sprite: SpriteState

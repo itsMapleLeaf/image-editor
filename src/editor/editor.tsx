@@ -1,7 +1,10 @@
-import { mdiImage, mdiVectorRectangle } from "@mdi/js"
+import { mdiDownload, mdiImage, mdiVectorRectangle } from "@mdi/js"
 import { Icon } from "@mdi/react"
 import { observer } from "mobx-react-lite"
-import { useRef } from "react"
+import { useEffect, useRef } from "react"
+import { createRoot } from "react-dom/client"
+import { Canvas } from "../canvas/canvas"
+import { assert } from "../common/assert"
 import { FrameOptions } from "../frame/frame-tool"
 import { ImageUploadButton } from "../image/image-tool"
 import { Point } from "../math/point"
@@ -9,8 +12,9 @@ import { SpriteState } from "../sprite/sprite-state"
 import { FileDropzone } from "../ui/file-dropzone"
 import type { PopoverHandle } from "../ui/popover"
 import { EditorCanvas } from "./editor-canvas"
+import { EditorSprites } from "./editor-sprites"
 import type { EditorState } from "./editor-state"
-import { ToolButton } from "./tool-button"
+import { ToolButton, ToolPopover } from "./tool-button"
 
 export const Editor = observer(function Editor({
   editor,
@@ -34,23 +38,59 @@ export const Editor = observer(function Editor({
       })
   }
 
+  const exportImage = () => {
+    const container = document.createElement("div")
+    createRoot(container).render(<Root />)
+
+    // I want to use the same rendering logic as the app,
+    // hence this weird inline component useEffect monstrosity 🤪
+    // eslint-disable-next-line mobx/missing-observer
+    function Root() {
+      useEffect(() => {
+        const canvas = assert(
+          container.querySelector("canvas"),
+          "no canvas found?",
+        )
+
+        const link = document.createElement("a")
+        link.href = canvas.toDataURL("image/png")
+        link.download = "exported.png"
+
+        document.body.append(link)
+        link.click()
+        link.remove()
+      }, [])
+
+      return (
+        <Canvas width={editor.frame.width} height={editor.frame.height}>
+          <EditorSprites editor={editor} />
+        </Canvas>
+      )
+    }
+  }
+
   return (
     <div className="fixed inset-0 flex flex-row">
       <nav>
         <ToolList>
-          <ToolButton
+          <ToolPopover
             name="Frame"
-            icon={<Icon path={mdiVectorRectangle} className="w-8" />}
+            icon={<Icon path={mdiVectorRectangle} className="w-6" />}
           >
             <FrameOptions frame={editor.frame} />
-          </ToolButton>
-          <ToolButton
+          </ToolPopover>
+          <ToolPopover
             name="Image"
-            icon={<Icon path={mdiImage} className="w-8" />}
+            icon={<Icon path={mdiImage} className="w-6" />}
             popoverRef={imagePopoverRef}
           >
             <ImageUploadButton onUpload={addImageSprite} />
-          </ToolButton>
+          </ToolPopover>
+          <ToolButton
+            name="Export"
+            icon={<Icon path={mdiDownload} className="w-6" />}
+            onClick={exportImage}
+          />
         </ToolList>
       </nav>
 

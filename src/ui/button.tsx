@@ -1,18 +1,15 @@
 import clsx from "clsx"
 import { forwardRef } from "react"
 
+export type ButtonProps = {
+  label?: React.ReactNode
+  active?: boolean
+  icon?: React.ReactNode
+  onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void
+}
+
 export const Button = forwardRef(function Button(
-  {
-    label,
-    icon,
-    active,
-    onClick,
-  }: {
-    label?: React.ReactNode
-    active?: boolean
-    icon?: React.ReactNode
-    onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void
-  },
+  { label, icon, active, onClick }: ButtonProps,
   ref: React.Ref<HTMLButtonElement>,
 ) {
   return (
