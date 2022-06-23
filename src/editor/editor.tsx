@@ -4,7 +4,9 @@ import { observer } from "mobx-react-lite"
 import { useEffect, useRef } from "react"
 import { createRoot } from "react-dom/client"
 import { Canvas } from "../canvas/canvas"
+import { canvasToBlob } from "../canvas/canvas-to-blob"
 import { assert } from "../common/assert"
+import { downloadFile } from "../dom/download-file"
 import { FrameOptions } from "../frame/frame-tool"
 import { ImageUploadButton } from "../image/image-tool"
 import { Point } from "../math/point"
@@ -47,18 +49,20 @@ export const Editor = observer(function Editor({
     // eslint-disable-next-line mobx/missing-observer
     function Root() {
       useEffect(() => {
-        const canvas = assert(
-          container.querySelector("canvas"),
-          "no canvas found?",
-        )
+        const saveCanvas = async () => {
+          const canvas = assert(
+            container.querySelector("canvas"),
+            "no canvas found?",
+          )
 
-        const link = document.createElement("a")
-        link.href = canvas.toDataURL("image/png")
-        link.download = "exported.png"
-
-        document.body.append(link)
-        link.click()
-        link.remove()
+          await downloadFile(await canvasToBlob(canvas), "exported.png", [
+            {
+              description: "Images",
+              accept: { "image/*": [".png"] },
+            },
+          ])
+        }
+        saveCanvas().catch(console.error)
       }, [])
 
       return (
