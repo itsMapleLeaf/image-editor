@@ -50,15 +50,14 @@ export const EditorCanvas = observer(function EditorCanvas({
   })
 
   useEffect(() => {
-    return autorun(() => {
-      const background = new Renderer(assert(backgroundRef.current))
-      const foreground = new Renderer(assert(foregroundRef.current))
+    const background = new Renderer(assert(backgroundRef.current))
+    const foreground = new Renderer(assert(foregroundRef.current))
 
+    return autorun(() => {
       background.clear()
       editor.renderSprites(background)
 
       foreground.clear()
-
       editor.renderFrameBackground(foreground)
 
       const { width, height } = editor.frame
