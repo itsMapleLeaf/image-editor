@@ -66,9 +66,7 @@ export const EditorCanvas = observer(function EditorCanvas({
         editor.renderSprites(foreground)
       })
 
-      if (editor.selectedSprite) {
-        editor.renderSpriteSelection(foreground, editor.selectedSprite)
-      }
+      editor.selectedSprite?.renderSelection(foreground)
     })
   }, [editor])
 

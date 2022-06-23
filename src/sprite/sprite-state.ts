@@ -1,4 +1,5 @@
 import { makeAutoObservable } from "mobx"
+import type { Renderer } from "../canvas/renderer"
 import { loadImage } from "../dom/load-image"
 import { Point } from "../math/point"
 import { Rect } from "../math/rect"
@@ -105,5 +106,17 @@ export class SpriteState {
     if (bottomResizeArea.contains(pointer)) return "resizeBottom"
 
     if (this.rect.contains(pointer)) return "move"
+  }
+
+  renderSelection(renderer: Renderer) {
+    const { left, top, width, height, corners } = this.rect
+    const color = "rgb(96, 165, 250)"
+    const props = { left, top, width, height, color }
+
+    renderer.fillRect({ ...props, alpha: 0.25 })
+    renderer.strokeRect({ ...props, lineWidth: 2 })
+    for (const corner of corners) {
+      renderer.fillArc({ x: corner.x, y: corner.y, radius: 5, color })
+    }
   }
 }
