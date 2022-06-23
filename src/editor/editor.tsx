@@ -1,11 +1,9 @@
 import { mdiDownload, mdiImage, mdiVectorRectangle } from "@mdi/js"
 import { Icon } from "@mdi/react"
 import { observer } from "mobx-react-lite"
-import { useEffect, useRef } from "react"
-import { createRoot } from "react-dom/client"
-import { Canvas } from "../canvas/canvas"
+import { useRef } from "react"
 import { canvasToBlob } from "../canvas/canvas-to-blob"
-import { assert } from "../common/assert"
+import { Renderer } from "../canvas/renderer"
 import { downloadFile } from "../dom/download-file"
 import { FrameOptions } from "../frame/frame-tool"
 import { ImageUploadButton } from "../image/image-tool"
@@ -14,7 +12,6 @@ import { SpriteState } from "../sprite/sprite-state"
 import { FileDropzone } from "../ui/file-dropzone"
 import type { PopoverHandle } from "../ui/popover"
 import { EditorCanvas } from "./editor-canvas"
-import { EditorSprites } from "./editor-sprites"
 import type { EditorState } from "./editor-state"
 import { ToolButton, ToolPopover } from "./tool-button"
 
@@ -40,37 +37,21 @@ export const Editor = observer(function Editor({
       })
   }
 
-  const exportImage = () => {
-    const container = document.createElement("div")
-    createRoot(container).render(<Root />)
+  const exportImage = async () => {
+    const canvas = document.createElement("canvas")
+    canvas.width = editor.frame.width
+    canvas.height = editor.frame.height
 
-    // I want to use the same rendering logic as the app,
-    // hence this weird inline component useEffect monstrosity 🤪
-    // eslint-disable-next-line mobx/missing-observer
-    function Root() {
-      useEffect(() => {
-        const saveCanvas = async () => {
-          const canvas = assert(
-            container.querySelector("canvas"),
-            "no canvas found?",
-          )
+    const renderer = new Renderer(canvas)
 
-          await downloadFile(await canvasToBlob(canvas), "exported.png", [
-            {
-              description: "Images",
-              accept: { "image/*": [".png"] },
-            },
-          ])
-        }
-        saveCanvas().catch(console.error)
-      }, [])
+    editor.renderSprites(renderer)
 
-      return (
-        <Canvas width={editor.frame.width} height={editor.frame.height}>
-          <EditorSprites editor={editor} />
-        </Canvas>
-      )
-    }
+    await downloadFile(await canvasToBlob(canvas), "exported.png", [
+      {
+        description: "Images",
+        accept: { "image/*": [".png"] },
+      },
+    ])
   }
 
   return (

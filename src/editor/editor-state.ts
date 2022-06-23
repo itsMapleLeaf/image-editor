@@ -1,4 +1,5 @@
 import { makeAutoObservable } from "mobx"
+import type { Renderer } from "../canvas/renderer"
 import { FrameState } from "../frame/frame-state"
 import type { Point } from "../math/point"
 import type { SpritePointerIntent, SpriteState } from "../sprite/sprite-state"
@@ -94,5 +95,34 @@ export class EditorState {
 
   handlePointerUp() {
     this.activeSpriteIntent = undefined
+  }
+
+  renderSprites(renderer: Renderer) {
+    for (const sprite of this.sprites) {
+      const { left, top, width, height } = sprite.rect
+      renderer.drawImage(sprite.image, { left, top, width, height })
+    }
+  }
+
+  renderFrameBackground(renderer: Renderer) {
+    renderer.fillRect({
+      left: 0,
+      top: 0,
+      width: this.frame.width,
+      height: this.frame.height,
+      color: "rgba(0, 0, 0, 0.25)",
+    })
+  }
+
+  renderSpriteSelection(renderer: Renderer, sprite: SpriteState) {
+    const { left, top, width, height, corners } = sprite.rect
+    const color = "rgb(96, 165, 250)"
+    const props = { left, top, width, height, color }
+
+    renderer.fillRect({ ...props, alpha: 0.25 })
+    renderer.strokeRect({ ...props, lineWidth: 2 })
+    for (const corner of corners) {
+      renderer.fillArc({ x: corner.x, y: corner.y, radius: 5, color })
+    }
   }
 }

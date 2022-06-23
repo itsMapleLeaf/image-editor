@@ -1,19 +1,11 @@
+import { autorun } from "mobx"
 import { observer } from "mobx-react-lite"
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import useMeasure from "react-use-measure"
-import {
-  Canvas,
-  ClipRect,
-  FillCircle,
-  FillRect,
-  Image,
-  StrokeRect,
-} from "../canvas/canvas"
-import { pick } from "../common/pick"
+import { Renderer } from "../canvas/renderer"
+import { assert } from "../common/assert"
 import { useWindowEvent } from "../dom/use-window-event"
 import { Point } from "../math/point"
-import type { SpriteState } from "../sprite/sprite-state"
-import { EditorSprites } from "./editor-sprites"
 import type { EditorState } from "./editor-state"
 
 export const EditorCanvas = observer(function EditorCanvas({
@@ -21,6 +13,8 @@ export const EditorCanvas = observer(function EditorCanvas({
 }: {
   editor: EditorState
 }) {
+  const backgroundRef = useRef<HTMLCanvasElement>(null)
+  const foregroundRef = useRef<HTMLCanvasElement>(null)
   const [containerRef, containerRect] = useMeasure()
   const [pointer, setPointer] = useState(new Point())
 
@@ -55,6 +49,29 @@ export const EditorCanvas = observer(function EditorCanvas({
     editor.handlePointerUp()
   })
 
+  useEffect(() => {
+    return autorun(() => {
+      const background = new Renderer(assert(backgroundRef.current))
+      const foreground = new Renderer(assert(foregroundRef.current))
+
+      background.clear()
+      editor.renderSprites(background)
+
+      foreground.clear()
+
+      editor.renderFrameBackground(foreground)
+
+      const { width, height } = editor.frame
+      foreground.clipRect({ left: 0, top: 0, width, height }, () => {
+        editor.renderSprites(foreground)
+      })
+
+      if (editor.selectedSprite) {
+        editor.renderSpriteSelection(foreground, editor.selectedSprite)
+      }
+    })
+  }, [editor])
+
   return (
     <div
       ref={containerRef}
@@ -65,72 +82,18 @@ export const EditorCanvas = observer(function EditorCanvas({
         editor.handlePointerDown(getFrameRelativePointerPosition(event))
       }}
     >
-      <Canvas
+      <canvas
+        ref={backgroundRef}
         width={containerRect.width}
         height={containerRect.height}
         className="absolute inset-0 brightness-50"
-      >
-        <EditorSprites editor={editor} />
-      </Canvas>
-
-      <Canvas
+      />
+      <canvas
+        ref={foregroundRef}
         width={containerRect.width}
         height={containerRect.height}
         className="absolute inset-0"
-      >
-        <FillRect
-          width={editor.frame.width}
-          height={editor.frame.height}
-          color="rgba(0, 0, 0, 0.25)"
-        />
-
-        <ClipRect width={editor.frame.width} height={editor.frame.height}>
-          <EditorSprites editor={editor} />
-        </ClipRect>
-
-        {editor.selectedSprite && (
-          <SpriteSelection sprite={editor.selectedSprite} />
-        )}
-      </Canvas>
+      />
     </div>
-  )
-})
-
-export const SpriteImage = observer(function SpriteImage({
-  sprite,
-}: {
-  sprite: SpriteState
-}) {
-  return (
-    <Image
-      source={sprite.image}
-      {...pick(sprite.rect, ["left", "top", "width", "height"])}
-    />
-  )
-})
-
-const SpriteSelection = observer(function SpriteSelection({
-  sprite,
-}: {
-  sprite: SpriteState
-}) {
-  const { left, top, width, height, corners } = sprite.rect
-  const color = "rgb(96, 165, 250)"
-  const props = { left, top, width, height, color }
-
-  return (
-    <>
-      <FillRect {...props} alpha={0.25} />
-      <StrokeRect {...props} lineWidth={2} />
-      {corners.map((corner, index) => (
-        <FillCircle
-          key={index}
-          x={corner.x}
-          y={corner.y}
-          radius={5}
-          color={color}
-        />
-      ))}
-    </>
   )
 })
