@@ -110,7 +110,8 @@ export class EditorState {
       top: 0,
       width: this.frame.width,
       height: this.frame.height,
-      color: "rgba(0, 0, 0, 0.25)",
+      color: "black",
+      alpha: 0.25,
     })
   }
 }
